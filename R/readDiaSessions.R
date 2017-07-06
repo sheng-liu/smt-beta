@@ -59,8 +59,12 @@
 ##' outputRowWise(trackll)
 ##' outputColWise(trackll)
 ##' 
+##' #To find your current working directory
+##' getwd()
+##' 
 ##' #Remove default fourth frame record column
 ##' trackll.removed <- removeFrameRecord(trackll)
+##' 
 
 ##' @export readDiaSessions
 ##' @export removeFrameRecord
@@ -268,7 +272,7 @@ outputRowWise = function(track.list){
     
     #Write the data frame df into the .csv and display confirmation text
     write.csv(df, file="outputRow.csv");
-    cat("output.csv placed in current directory.\n\n");
+    cat("outputRow.csv placed in current directory.\n\n");
 }
 
 #### outputColWise ####
@@ -300,5 +304,5 @@ outputColWise = function(track.list){
     
     #Write the data frame df into the .csv and display confirmation text
     write.csv(df, file="outputCol.csv");
-    cat("output.csv placed in home directory.\n\n");
+    cat("outputCol.csv placed in home directory.\n\n");
 }

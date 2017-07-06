@@ -59,6 +59,10 @@ trackll2 <- readDiaSessions(frameRecord = F, rowWise = T, colWise = T)
 outputRowWise(trackll)
 outputColWise(trackll)
 
+#To find your current working directory
+getwd()
+
 #Remove default fourth frame record column
 trackll.removed <- removeFrameRecord(trackll)
+
 }

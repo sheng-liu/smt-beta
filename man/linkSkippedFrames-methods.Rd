@@ -15,7 +15,7 @@ linkSkippedFrames(track.list, tolerance, maxSkip)
 \item{maxSkip}{maximum number of frames a trajectory can skip}
 }
 \description{
-link trajectories that seem to have skipped (or do not appear for) a number of frames
+link trajectories skipped (or do not appear for) a number of frames
 }
 \details{
 Given user input for a tolerance level to limit how far the next point after the skip can deviate from the last point in pixel distance 
