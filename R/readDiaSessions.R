@@ -1,18 +1,75 @@
 #### readDiaSessions.R
 #### Wu Lab, Johns Hopkins University
 #### Author: Sun Jay Yoo
-#### Date: June 23, 2017
+#### Date: July 6, 2017
 
+## readDiaSessions-methods
+##
+##
+###############################################################################
+##' @name readDiaSessions
+##' @aliases readDiaSessions
+##' @title readDiaSessions
+##' @rdname readDiaSessions-methods
+##' @docType methods
+##'
+##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
+                                         
+##' @usage 
+##' readDiaSessions(file, interact = TRUE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
+##'
+##' removeFrameRecord(track.list)
+##' 
+##' outputRowWise(track.list)
+##' 
+##' outputColWise(track.list)
 
+##' @param file Full path to Diatrack .mat session file
+##' @param interact Open menu to interactively choose file
+##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
+##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
+##' @param rowWise Output .csv file in current directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call
+##' @param colWise Output .csv file in current directory of tracks in column-wise (Diatrack stye) using outputColWise function call
+##' @param timer Time the computation duration of the script
+##' @param track.list A track list (a list of trajectory data frames)
+
+##' @details
+##' The naming scheme for each track is as follows:
+##' 
+##' [Last five characters of the file name].[Start frame #].[Length].[Track #]
+##' 
+##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
+##' 
+##' removeFrameRecord is a helper script aims to make track lists with a fourth frame record column backwards compatible 
+##' with other smt functions that rely on track lists with only three columns for the xyz-coordinates. 
+##' The fourth column is simply removed from the given track list.
+##' 
+##' outputRowWise is only compatible with track lists with the fourth frame record column.
+##' 
+##' outputColWise is compatible with track lists both with or without the fourth frame record column.
+
+##' @examples
+##' #Basic function call of readDiaSessions
+##' trackll <- readDiaSessions()
+##' 
+##' #Function call of readDiaSessions without a frame record and output to .csv files
+##' trackll2 <- readDiaSessions(frameRecord = F, rowWise = T, colWise = T)
+##' 
+##' #Option to output .csv files after processing the track lists
+##' outputRowWise(trackll)
+##' outputColWise(trackll)
+##' 
+##' #Remove default fourth frame record column
+##' trackll.removed <- removeFrameRecord(trackll)
 
 ##' @export readDiaSessions
 ##' @export removeFrameRecord
 ##' @export outputColWise
 ##' @export outputRowWise
-##' @export linkSkippedFrames
 
 ##' @importFrom R.matlab readMat
 
+###############################################################################
 
 #### Note ####
 
@@ -37,15 +94,7 @@
 
 #Install packages and dependencies
 #install.packages("R.matlab")
-library(R.matlab)
-
-#PARAMETERS: 
-#file = filepath input if desired, interact = open menu to choose file
-#censorSingle = skip tracks that only appear for one frame
-#rowWise = output .csv file in home directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call
-#colWise = output .csv file in home directory of tracks in column-wise (ImageJ stye) using output
-#timer = time duration of function
-#frameRecord = add a column for frame number for each coordinate point
+#library(R.matlab)
 
 readDiaSessions = function(file, interact = TRUE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE){
     
@@ -188,9 +237,6 @@ readDiaSessions = function(file, interact = TRUE, censorSingle = TRUE, frameReco
 
 #### removeFrameRecord ####
 
-#PARAMETERS:
-#track.list = track list output with frame record
-
 removeFrameRecord = function(track.list){
     for (i in 1:length(track.list)){
         track.list[[i]] <- track.list[[i]][-c(4)];
@@ -198,60 +244,9 @@ removeFrameRecord = function(track.list){
     return (track.list);
 }
 
-#### getStartFrame ####
-
-#PARAMETERS: 
-#track.list = named track list output
-#Note: Last five characters of the original file name without extension (cannot contain ".")
-#index = index in track list
-
-getStartFrame = function(track.list, index){
-    return(as.numeric(substr(names(track.list[index]), 
-                             gregexpr(pattern = '\\.', names(track.list[index]))[[1]][1]+1, 
-                             gregexpr(pattern = '\\.', names(track.list[index]))[[1]][2]-1)));
-}
-
-#### outputColWise ####
-
-#Install packages and dependencies
-library(plyr)
-
-#PARAMETERS: 
-#track.list = track list output from readDiatrack or readDiaSessions
-
-outputColWise = function(track.list){
-    
-    #Confirmation text of function call
-    cat("Writing .csv column-wise output in home directory...\n");
-    
-    #Empty data frame df to be written into the .csv
-    df <- NULL;
-    
-    #Loop through every trajectory in input track.list
-    for (i in 1:length(track.list)){
-        
-                #Create temporary data frame to be filled with transposed lists from track.list
-                temp <- NULL;
-                for (j in 1:3){
-                        var <- data.frame(t(track.list[[i]][j]));
-                        temp <- rbind(temp, var);
-                }
-                
-                #Append data frame df for .csv with temporary data frame
-                df <- rbind.fill(df, temp);
-    }
-    
-    #Write the data frame df into the .csv and display confirmation text
-    write.csv(df, file="outputCol.csv");
-    cat("output.csv placed in home directory.\n\n");
-}
-
 #### outputRowWise ####
 
 #MUST USE TRACK LIST WITH FRAME RECORD
-
-#PARAMETERS: 
-#track.list = track list output from readDiatrack or readDiaSessions
 
 outputRowWise = function(track.list){
     
@@ -276,145 +271,34 @@ outputRowWise = function(track.list){
     cat("output.csv placed in current directory.\n\n");
 }
 
-#### linkSkippedFrames ####
+#### outputColWise ####
 
-#PARAMETERS: 
-#track.list = track list output from readDiatrack or readDiaSessions
-#tolerance = tolerance level in pixels
-#maxSkip = maximum number of frame skips
+#Install packages and dependencies
+#library(plyr)
 
-linkSkippedFrames = function(track.list, tolerance, maxSkip){
+outputColWise = function(track.list){
     
     #Confirmation text of function call
-    cat("Linking trajectories with a tolerance of",  tolerance, "and a maximum frame skip of", maxSkip,  "...\n");
+    cat("Writing .csv column-wise output in home directory...\n");
     
-    #Instantiate empty linked track list
-    track.list.linked = list();
+    #Empty data frame df to be written into the .csv
+    df <- NULL;
     
-    #Instantiate frame/length/linknum list for track naming
-    frame.list = list();
-    length.list = list();
-    linknum.list = list();
-    
-    #Instantiate starting frame of the last trajectory, max frame after skips, and index
-    lastTrajFrame = getStartFrame(track.list, length(track.list));
-    maxFrame = maxSkip + 1;
-    trajectoryIndex = 1;
-    
-    #Extract file sub-name from given track list
-    file.subname = substr(names(track.list[1]), 1, gregexpr(pattern = '\\.', names(track.list[1]))[[1]][1] - 1);
-    
-    #Loop through each new linked trajectory
-    repeat{
+    #Loop through every trajectory in input track.list
+    for (i in 1:length(track.list)){
         
-        #Extract first trajectory in track list into data frame temp for linking trajectories
-        temp <- track.list[[1]];
-        
-        #Record the start amd last frame of the starting trajectory from track name
-        startFrame = getStartFrame(track.list, 1);
-        lastFrame = getStartFrame(track.list, 1) + nrow(temp) - 1;
-        
-        #Delete the extracted first trajectory from track list and shift list to replace
-        #The first trajectory in the track list is the next trajectory after the data frame temp
-        track.list[[1]] <- NULL
-        
-        #Record the last X and Y coordinate values of data frame temp
-        lastX = temp[[1]][[nrow(temp)]];
-        lastY = temp[[2]][[nrow(temp)]];
-        
-        #Set link counter to 0;
-        linkCounter = 0;
-        
-        #Instantiate index i and loop through trajectories in track list to look for frame skips 
-        i = 1;
-        repeat{
-            
-            #If the starting frame of the trajectory is beyond the maximum skips possible or the last frame, break
-            nextFrame =  getStartFrame(track.list, i);
-            if (i > length(track.list) || nextFrame > lastFrame + maxFrame){
-                break;
-            }
-            
-            #Record the first X and Y coordinate values of trajectory
-            nextX = track.list[[i]][[1]][[1]];
-            nextY = track.list[[i]][[2]][[1]];
-            
-            #Check if the first XY values of trajectory and the last XY values in temp are within the set tolerance
-            if (abs(lastX-nextX) <= tolerance && abs(lastY-nextY) <= tolerance){
-                
-                #Update lastFrame
-                lastFrame = getStartFrame(track.list, i) + nrow(track.list[[i]]) - 1;
-                
-                #Append trajectory to temp
-                temp <- rbind(temp, track.list[[i]]);
-                
-                #Delete trajectory from track list and shift
-                track.list[[i]] <- NULL
-                
-                #Recalculate last X and Y coordinate values of appended data frame temp
-                lastX = temp[[1]][[nrow(temp)]];
-                lastY = temp[[2]][[nrow(temp)]];
-                
-                #Increment link counter
-                linkCounter = linkCounter + 1;
-                
-            } else {
-                
-                #Increment index to next trajectory if nothing is found
-                i = i + 1;
-            }
+        #Create temporary data frame to be filled with transposed lists from track.list
+        temp <- NULL;
+        for (j in 1:3){
+            var <- data.frame(t(track.list[[i]][j]));
+            temp <- rbind(temp, var);
         }
         
-        #Add start frame to frame list
-        frame.list[[length(frame.list) + 1]] <- startFrame;
-        
-        #Add track length to length list
-        length.list[[length(length.list) + 1]] <- nrow(temp);
-        
-        linknum.list[[length(linknum.list) + 1]] <- linkCounter;
-        
-        #Append data frame temp of the fully linked trajectory into track.list.linked and increment index
-        track.list.linked[[trajectoryIndex]] <- temp;
-        trajectoryIndex = trajectoryIndex + 1;
-        
-        #Break if the track list of decreasing length is empty 
-        if (length(track.list) == 0){
-            break;
-        }
+        #Append data frame df for .csv with temporary data frame
+        df <- rbind.fill(df, temp);
     }
     
-    #Name track list:
-    #[File name from input].[Start frame #].[Length].[Track #].[# of links]
-    names(track.list.linked) = paste(file.subname, frame.list, length.list, c(1:length(track.list.linked)), linknum.list, sep=".");
-    
-    #Return linked track list and confirmation text
-    cat(Reduce("+", linknum.list), "links found.\n\n");
-    
-    return (track.list.linked);
+    #Write the data frame df into the .csv and display confirmation text
+    write.csv(df, file="outputCol.csv");
+    cat("output.csv placed in home directory.\n\n");
 }
-
-#### Extra and useless functions ####
-
-findMaxLinks = function(track.list, maxTolerance = 10, maxMaxSkip = 500){
-    minLength = length(track.list)
-    minTolerance = maxTolerance
-    minSkip = maxMaxSkip
-    cat("Searching...");
-    for (i in 1:maxTolerance){
-        for (j in 1:maxMaxSkip){
-            length = length(linkSkippedFrames(track.list, tolerance = i, maxSkip = j, print = F));
-            if (length < minLength){
-                minLength = length
-                minTolerance = i
-                minSkip = j
-            }
-            
-        }
-    }
-    cat("For the maximum number of links, with minimum tolerance and then minimum skips:")
-    cat("\nTolerance =",  tolerance)
-    cat("\nSkips =",  minSkip)
-    cat("\nLength =",  minLength)
-}
-
-
