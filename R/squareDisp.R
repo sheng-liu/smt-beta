@@ -88,3 +88,28 @@ squareDisp=function(track,dt=1,resolution=0.107){
 #
 # distribution of displacement, tells how centralized or spread the trajectory is, is a parameter to measure trajectory
 # calculate square displacement for all tracks
+
+
+##------------------------------------------------------------------------------
+## squareDispCpp
+
+## calculate square displacement of a track/trajectory as a function of time/step
+## data.frame has two column, x and y
+## also calculate dx, dy bivariate
+
+##' @export squareDispCpp
+
+##' @importFrom Rcpp sourceCpp
+ 
+squareDispCpp = function(track, dt = 1, resolution = 0.107){
+    #convert given track to matrix type
+    track.out = data.matrix(track);
+    
+    #Compile source C++ file
+    file=system.file("cpp",package="smt", "squareDispRcpp.cpp");
+    sourceCpp(file);
+    
+    #run squareDispRcpp.cpp 
+    track.dt = squareDispRcpp(track.out, dt, resolution);
+    return (track.dt);
+}
