@@ -3,6 +3,7 @@
 \docType{methods}
 \name{readDiaSessions}
 \alias{readDiaSessions}
+\alias{.readDiaSessions}
 \title{readDiaSessions}
 \usage{
 readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
@@ -26,9 +27,8 @@ outputColWise(track.list)
 
 \item{rowWise}{Output .csv file in current directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call}
 
-\item{colWise}{Output .csv file in current directory of tracks in column-wise (Diatrack stye) using outputColWise function call}
-
-\item{timer}{Time the computation duration of the script}
+\item{colWise}{Output .csv file in current directory of tracks in column-wise (Diatrack stye) using outputColWise function call
+#@param timer Time the computation duration of the script}
 
 \item{track.list}{A track list (a list of trajectory data frames)}
 }
