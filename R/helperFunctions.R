@@ -133,3 +133,17 @@ getStartFrame = function(track.list, index){
                              gregexpr(pattern = '\\.', names(track.list[index]))[[1]][1]+1, 
                              gregexpr(pattern = '\\.', names(track.list[index]))[[1]][2]-1)));
 }
+
+##------------------------------------------------------------------------------
+## abTrack
+# returns absolute corrdinates of a track (for plotting)
+
+#PARAMETERS: 
+#track = track input to be transformed into absolute coordinates
+
+##'@export abTrack
+abTrack = function(track){
+    min.x = min(track$x);
+    min.y = min(track$y);
+    return(data.frame(x=track$x-min.x, y=track$y-min.y));
+}

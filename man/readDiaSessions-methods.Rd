@@ -5,7 +5,7 @@
 \alias{readDiaSessions}
 \title{readDiaSessions}
 \usage{
-readDiaSessions(file, interact = TRUE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
+readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
 
 removeFrameRecord(track.list)
 
@@ -17,6 +17,8 @@ outputColWise(track.list)
 \item{file}{Full path to Diatrack .mat session file}
 
 \item{interact}{Open menu to interactively choose file}
+
+\item{ab.track}{Use absolute coordinates for tracks}
 
 \item{censorSingle}{Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)}
 

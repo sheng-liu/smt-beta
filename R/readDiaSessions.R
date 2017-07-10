@@ -16,7 +16,7 @@
 ##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
                                          
 ##' @usage 
-##' readDiaSessions(file, interact = TRUE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
+##' readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
 ##'
 ##' removeFrameRecord(track.list)
 ##' 
@@ -26,6 +26,7 @@
 
 ##' @param file Full path to Diatrack .mat session file
 ##' @param interact Open menu to interactively choose file
+##' @param ab.track Use absolute coordinates for tracks
 ##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 ##' @param rowWise Output .csv file in current directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call
@@ -100,7 +101,7 @@
 #install.packages("R.matlab")
 #library(R.matlab)
 
-readDiaSessions = function(file, interact = TRUE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE){
+readDiaSessions = function(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE){
     
     #Interactively open window
     if (interact == TRUE) {
@@ -203,6 +204,11 @@ readDiaSessions = function(file, interact = TRUE, censorSingle = TRUE, frameReco
             
             #Add track length to length list
             length.list[[length(length.list) + 1]] <- nrow(track);
+            
+            #Calcualte absolute track coordinates if desired
+            if (ab.track){
+                track <- abTrack(track);
+            }
             
             #Append temporary track for particle into track list and iterate to the next trajectory
             track.list[[trajectoryIndex]] <- track;
