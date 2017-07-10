@@ -1,7 +1,7 @@
 #### readDiaSessions.R
 #### Wu Lab, Johns Hopkins University
 #### Author: Sun Jay Yoo
-#### Date: July 6, 2017
+#### Date: July 10, 2017
 
 ## readDiaSessions-methods
 ##
@@ -16,7 +16,7 @@
 ##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
                                          
 ##' @usage 
-##' readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
+##' readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE)
 ##'
 ##' removeFrameRecord(track.list)
 ##' 
@@ -29,10 +29,6 @@
 ##' @param ab.track Use absolute coordinates for tracks
 ##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
-##' @param rowWise Output .csv file in current directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call
-##' @param colWise Output .csv file in current directory of tracks in column-wise (Diatrack stye) using outputColWise function call
-##' #@param timer Time the computation duration of the script
-##' @param track.list A track list (a list of trajectory data frames)
 
 ##' @details
 ##' The naming scheme for each track is as follows:
@@ -101,7 +97,7 @@
 #install.packages("R.matlab")
 #library(R.matlab)
 
-.readDiaSessions = function(file, interact = F, ab.track = F, censorSingle = T, frameRecord = T){
+.readDiaSessions = function(file, interact = F, ab.track = F, censorSingle = F, frameRecord = T){
     
     #Interactively open window
     if (interact == TRUE) {
@@ -220,7 +216,7 @@
     names(track.list) = paste(file.subname, frame.list, length.list, c(1:length(track.list)), sep=".");
     
     #File read and processedconfirmation text
-    cat("Session file read and processed.\n\n")
+    cat("Session file read and processed.\n")
     
     #Display stop timer
     #if (timer == TRUE) {
