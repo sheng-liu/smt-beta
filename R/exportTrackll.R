@@ -17,7 +17,7 @@
 ##' @description take in a list of track lists (trackll) and export it into row-wise and/or column-wise .csv files in the working directory
 
 ##' @usage 
-##' exportTrackll(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F))
+##' exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
 ##' 
 ##' .exportRowWise(track.list)
 ##' 
@@ -108,7 +108,7 @@
 
 #### exportTrackll ####
 
-exportTrackll = function(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F)){
+exportTrackll = function(trackll, rowWise = T, colWise = T, cores = 1){
     
     # detect number of cores
     max.cores=parallel::detectCores(logical=F)
