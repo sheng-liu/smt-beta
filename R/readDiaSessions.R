@@ -16,13 +16,10 @@
 ##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
                                          
 ##' @usage 
-##' readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE)
+##' .readDiaSessions(file, interact = T, ab.track = F, censorSingle = T, frameRecord = T)
 ##'
 ##' removeFrameRecord(track.list)
 ##' 
-##' outputRowWise(track.list)
-##' 
-##' outputColWise(track.list)
 
 ##' @param file Full path to Diatrack .mat session file
 ##' @param interact Open menu to interactively choose file
@@ -40,33 +37,28 @@
 ##' removeFrameRecord is a helper script aims to make track lists with a fourth frame record column backwards compatible 
 ##' with other smt functions that rely on track lists with only three columns for the xyz-coordinates. 
 ##' The fourth column is simply removed from the given track list.
-##' 
-##' outputRowWise is only compatible with track lists with the fourth frame record column.
-##' 
-##' outputColWise is compatible with track lists both with or without the fourth frame record column.
+##'
 
 ##' @examples
-##' #Basic function call of readDiaSessions
-##' trackll <- readDiaSessions()
-##' 
-##' #Function call of readDiaSessions without a frame record and output to .csv files
-##' trackll2 <- readDiaSessions(frameRecord = F, rowWise = T, colWise = T)
+##' #Basic function call of .readDiaSessions
+##' trackl <- .readDiaSessions(interact = T)
+##'
+##' #Function call of .readDiaSessions with censoring without a frame record
+##' trackl2 <- .readDiaSessions(interact = T, censorSingle = T, frameRecord = F)
 ##' 
 ##' #Option to output .csv files after processing the track lists
-##' outputRowWise(trackll)
-##' outputColWise(trackll)
+##' .exportRowWise(trackl)
+##' .exportColWise(trackl)
 ##' 
 ##' #To find your current working directory
 ##' getwd()
 ##' 
 ##' #Remove default fourth frame record column
-##' trackll.removed <- removeFrameRecord(trackll)
+##' trackll.removed <- removeFrameRecord(trackl)
 ##' 
 
 ##' @export .readDiaSessions
 ##' @export removeFrameRecord
-##' @export outputColWise
-##' @export outputRowWise
 ##' @export readDiaSessions
 
 ##' @importFrom R.matlab readMat
@@ -216,7 +208,7 @@
     names(track.list) = paste(file.subname, frame.list, length.list, c(1:length(track.list)), sep=".");
     
     #File read and processedconfirmation text
-    cat("Session file read and processed.\n")
+    cat("\nSession file read and processed.\n")
     
     #Display stop timer
     #if (timer == TRUE) {
@@ -240,68 +232,9 @@ removeFrameRecord = function(track.list){
     return (track.list);
 }
 
-#### outputRowWise ####
+#### readDiaSessions ####
 
-#MUST USE TRACK LIST WITH FRAME RECORD
-
-outputRowWise = function(track.list){
-    
-    #Confirmation text of function call
-    cat("Writing .csv row-wise output in current directory...\n");
-    
-    #Empty data frame df to be written into the .csv
-    df <- NULL;
-    
-    #Loop through every trajectory in input track.list
-    for (i in 1:length(track.list)){
-        
-        #Create a data frame temp with trajectory, frame, and track coordinate data 
-        temp <- data.frame(Trajectory = i, Frame = track.list[[i]][4], track.list[[i]][1:3]);
-        
-        #Append data frame df with data frame temp
-        df <- rbind(df, temp);
-    }
-    
-    #Write the data frame df into the .csv and display confirmation text
-    write.csv(df, file="outputRow.csv");
-    cat("outputRow.csv placed in current directory.\n\n");
-}
-
-#### outputColWise ####
-
-#Install packages and dependencies
-#library(plyr)
-
-outputColWise = function(track.list){
-    
-    #Confirmation text of function call
-    cat("Writing .csv column-wise output in home directory...\n");
-    
-    #Empty data frame df to be written into the .csv
-    df <- NULL;
-    
-    #Loop through every trajectory in input track.list
-    for (i in 1:length(track.list)){
-        
-        #Create temporary data frame to be filled with transposed lists from track.list
-        temp <- NULL;
-        for (j in 1:3){
-            var <- data.frame(t(track.list[[i]][j]));
-            temp <- rbind(temp, var);
-        }
-        
-        #Append data frame df for .csv with temporary data frame
-        df <- rbind.fill(df, temp);
-    }
-    
-    #Write the data frame df into the .csv and display confirmation text
-    write.csv(df, file="outputCol.csv");
-    cat("outputCol.csv placed in home directory.\n\n");
-}
-
-### readDiaSessions ###
-
-readDiaSessions=function(folder, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = T, frameRecord = T){
+readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = T, frameRecord = T){
     
     trackll = list()
     track.holder = c()

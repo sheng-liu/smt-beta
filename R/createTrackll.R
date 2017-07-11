@@ -1,9 +1,9 @@
-#### readDiaSessions.R
+#### createTrackll.R
 #### Wu Lab, Johns Hopkins University
 #### Author: Sun Jay Yoo
-#### Date: July 10, 2017
+#### Date: July 11, 2017
 
-## readDiaSessions-methods
+## createTrackll-methods
 ##
 ##
 ###############################################################################
@@ -13,23 +13,22 @@
 ##' @rdname createTrackll-methods
 ##' @docType methods
 ##'
-##' @description createTrackll
+##' @description take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a folder to output a list of track lists with the option to merge, mask, censor, record frames, and use multiple cores.
 
 ##' @usage 
-##' 
+##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
 
-
-##' @param folder Full path to Diatrack output file.
+##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)
 ##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)
 ##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
 ##' @param ab.track Use absolute coordinates for tracks
-##' @param mask An logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
+##' @param mask A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
 ##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @details
-##' 
+##' NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
 
 ##' @examples
 ##' 
@@ -40,7 +39,7 @@
 
 ### createTrackll ###
 
-createTrackll=function(folder, input = 0, interact = T, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
+createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
     
     if (interact){
         cat("Enter input file type and press ENTER: \n")

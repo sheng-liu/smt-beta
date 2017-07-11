@@ -16,7 +16,7 @@
 ##' @description take in a SlimFast .txt session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories
 
 ##' @usage 
-##' readSlimFast(file, interact = FALSE, censorSingle = TRUE)
+##' .readSlimFast(file, interact = F,  ab.track = F, censorSingle = F, frameRecord = T)
 
 ##' @param file Full path to SlimFast .txt session file
 ##' @param interact Open menu to interactively choose file
@@ -32,6 +32,21 @@
 ##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
 
 ##' @examples
+##' #Basic function call of .readSlimFast
+##' trackl <- .readSlimFast(interact = T)
+##' 
+##' #Function call of .readSlimFast with censoring without a frame record and output to .csv files
+##' trackl2 <- .readSlimFast(interact = T, censorSingle = T, frameRecord = F)
+##' 
+##' #Option to output .csv files after processing the track lists
+##' .exportRowWise(trackl)
+##' .exportColWise(trackl)
+##' 
+##' #To find your current working directory
+##' getwd()
+##' 
+##' #Remove default fourth frame record column
+##' trackll.removed <- removeFrameRecord(trackl)
 ##' 
 
 ##' @export .readSlimFast

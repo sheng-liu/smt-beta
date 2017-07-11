@@ -6,13 +6,9 @@
 \alias{.readDiaSessions}
 \title{readDiaSessions}
 \usage{
-readDiaSessions(file, interact = TRUE, ab.track = FALSE, censorSingle = TRUE, frameRecord = TRUE, rowWise = FALSE, colWise = FALSE, timer = FALSE)
+.readDiaSessions(file, interact = T, ab.track = F, censorSingle = T, frameRecord = T)
 
 removeFrameRecord(track.list)
-
-outputRowWise(track.list)
-
-outputColWise(track.list)
 }
 \arguments{
 \item{file}{Full path to Diatrack .mat session file}
@@ -24,13 +20,6 @@ outputColWise(track.list)
 \item{censorSingle}{Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)}
 
 \item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
-
-\item{rowWise}{Output .csv file in current directory of tracks in row-wise (ImageJ style) organization using outputRowWise function call}
-
-\item{colWise}{Output .csv file in current directory of tracks in column-wise (Diatrack stye) using outputColWise function call
-#@param timer Time the computation duration of the script}
-
-\item{track.list}{A track list (a list of trajectory data frames)}
 }
 \description{
 take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
@@ -45,26 +34,22 @@ The naming scheme for each track is as follows:
 removeFrameRecord is a helper script aims to make track lists with a fourth frame record column backwards compatible 
 with other smt functions that rely on track lists with only three columns for the xyz-coordinates. 
 The fourth column is simply removed from the given track list.
-
-outputRowWise is only compatible with track lists with the fourth frame record column.
-
-outputColWise is compatible with track lists both with or without the fourth frame record column.
 }
 \examples{
-#Basic function call of readDiaSessions
-trackll <- readDiaSessions()
+#Basic function call of .readDiaSessions
+trackl <- .readDiaSessions(interact = T)
 
-#Function call of readDiaSessions without a frame record and output to .csv files
-trackll2 <- readDiaSessions(frameRecord = F, rowWise = T, colWise = T)
+#Function call of .readDiaSessions with censoring without a frame record
+trackl2 <- .readDiaSessions(interact = T, censorSingle = T, frameRecord = F)
 
 #Option to output .csv files after processing the track lists
-outputRowWise(trackll)
-outputColWise(trackll)
+.exportRowWise(trackl)
+.exportColWise(trackl)
 
 #To find your current working directory
 getwd()
 
 #Remove default fourth frame record column
-trackll.removed <- removeFrameRecord(trackll)
+trackll.removed <- removeFrameRecord(trackl)
 
 }

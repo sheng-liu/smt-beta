@@ -135,6 +135,19 @@ getStartFrame = function(track.list, index){
 }
 
 ##------------------------------------------------------------------------------
+## getTrackFileName
+# returns the shortened file name of the track
+
+#PARAMETERS: 
+#track.list = named track list output
+#Note: Last five characters of the original file name without extension (cannot contain ".")
+
+##'@export getTrackFileName
+getTrackFileName = function(track.list){
+    return(substr(names(track.list[1]), 1, gregexpr(pattern = '\\.', names(track.list[1]))[[1]][1]-1));
+}
+
+##------------------------------------------------------------------------------
 ## abTrack
 # returns absolute corrdinates of a track (for plotting)
 
