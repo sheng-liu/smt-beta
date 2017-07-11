@@ -5,7 +5,7 @@
 \alias{createTrackll}
 \title{createTrackll}
 \usage{
-createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
+createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = parallel::detectCores(logical=F), censorSingle = F, frameRecord = T)
 }
 \arguments{
 \item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)}
@@ -29,6 +29,15 @@ take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a 
 }
 \details{
 NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
+
+ The naming scheme for the list of track list is as follows:
+ 
+ Track List: [full name of input file]
+ Track: 
+
+[Last five characters of the file name].[Start frame #].[Length].[Track #].[Index # (will differ from Track # when merging)]
+
+(Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
 }
 \examples{
 

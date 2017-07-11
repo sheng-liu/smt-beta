@@ -6,10 +6,30 @@
 \alias{.exportRowWise}
 \title{exportTrackll}
 \usage{
+exportTrackll(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F))
+
 .exportRowWise(track.list)
+
+.exportColWise(track.list)
+}
+\arguments{
+\item{track.list}{a single track list}
+
+\item{trackll}{a list of track lists}
+
+\item{rowWise}{option to use Image-J style row-wise output in .csv files}
+
+\item{colWise}{optio to use Diatrack style col-wise output in .csv files}
+
+\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
+}
+\description{
+take in a list of track lists (trackll) and export it into row-wise and/or column-wise .csv files in the working directory
 }
 \details{
-outputRowWise is only compatible with track lists with the fourth frame record column.
+For .exportRowWise, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
 
-outputColWise is compatible with track lists both with or without the fourth frame record column.
+It is not recommended that exportTrackll be run on merged list of track lists (trackll).
+
+Ensure that the input trackll is a list of track lists and not just a trackl track list
 }

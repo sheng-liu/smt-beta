@@ -14,11 +14,28 @@
 ##' @docType methods
 ##'
 
-##' @details
-##' outputRowWise is only compatible with track lists with the fourth frame record column.
-##' 
-##' outputColWise is compatible with track lists both with or without the fourth frame record column.
+##' @description take in a list of track lists (trackll) and export it into row-wise and/or column-wise .csv files in the working directory
 
+##' @usage 
+##' exportTrackll(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F))
+##' 
+##' .exportRowWise(track.list)
+##' 
+##' .exportColWise(track.list)
+##' 
+
+##' @param trackll a list of track lists
+##' @param rowWise option to use Image-J style row-wise output in .csv files
+##' @param colWise optio to use Diatrack style col-wise output in .csv files
+##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
+##' @param track.list a single track list
+
+##' @details
+##' For .exportRowWise, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
+##' 
+##' It is not recommended that exportTrackll be run on merged list of track lists (trackll).
+##' 
+##' Ensure that the input trackll is a list of track lists and not just a trackl track list
 
 ##' @export .exportRowWise
 ##' @export .exportColWise
@@ -40,7 +57,6 @@
     for (i in 1:length(track.list)){
         
         #Create a data frame temp with trajectory, frame, and track coordinate data 
-        #If the track list does not have a fourth frame record column, it will just output the start frame of each track instead
         if (length(track.list[[i]]) == 4){
             temp <- data.frame("trajectory" = i, "frame" = track.list[[i]][4], track.list[[i]][1:3]);
         } else {
@@ -92,15 +108,50 @@
 
 #### exportTrackll ####
 
-exportTrackll = function(trackll, rowWise = T, colWise = T){
-    export <- lapply(trackll,function(x){
-        if (rowWise){
-            .exportRowWise(track.list = x)
-        }
-        if (colWise){
-            .exportColWise(track.list = x)
-        }
-    })
+exportTrackll = function(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F)){
     
+    # detect number of cores
+    max.cores=parallel::detectCores(logical=F)
+    
+    if (cores==1){
+        export = lapply(trackll,function(x){
+            if (rowWise){
+                .exportRowWise(track.list = x)
+            }
+            if (colWise){
+                .exportColWise(track.list = x)
+            }
+        })
+    } else {
+        # parallel excecute above block of code
+        if (cores>max.cores)
+            stop("Number of cores specified is greater than maxium: ",
+                 max.cores)
+        
+        cat("Initiated parallel execution on", cores, "cores\n")
+        
+        # use outfile="" to display result on screen
+        cl <- parallel::makeCluster(spec=cores,type="PSOCK",outfile="")
+        # register cluster
+        parallel::setDefaultCluster(cl)
+        
+        # pass environment variables to workers
+        parallel::clusterExport(cl,
+                                varlist=c(".exportRowWise",".exportColWise"),
+                                envir=environment())
+        
+        export = parallel::parLapply(cl,trackll,function(x){
+            if (rowWise){
+                .exportRowWise(track.list = x)
+            }
+            if (colWise){
+                .exportColWise(track.list = x)
+            }
+        })
+        
+        # stop cluster
+        cat("Stopping clusters...\n")
+        parallel::stopCluster(cl)
+    }
     
 }

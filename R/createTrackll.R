@@ -16,7 +16,7 @@
 ##' @description take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a folder to output a list of track lists with the option to merge, mask, censor, record frames, and use multiple cores.
 
 ##' @usage 
-##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
+##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = parallel::detectCores(logical=F), censorSingle = F, frameRecord = T)
 
 ##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)
 ##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)
@@ -29,6 +29,15 @@
 
 ##' @details
 ##' NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
+##'
+##'  The naming scheme for the list of track list is as follows:
+##'  
+##'  Track List: [full name of input file]
+##'  Track: 
+##' 
+##' [Last five characters of the file name].[Start frame #].[Length].[Track #].[Index # (will differ from Track # when merging)]
+##' 
+##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
 
 ##' @examples
 ##' 
@@ -39,7 +48,7 @@
 
 ### createTrackll ###
 
-createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
+createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = parallel::detectCores(logical=F), censorSingle = F, frameRecord = T){
     
     if (interact){
         cat("Enter input file type and press ENTER: \n")
