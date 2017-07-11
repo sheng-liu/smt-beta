@@ -6,7 +6,7 @@
 \alias{.exportRowWise}
 \title{exportTrackll}
 \usage{
-exportTrackll(trackll, rowWise = T, colWise = T, cores = parallel::detectCores(logical=F))
+exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
 
 .exportRowWise(track.list)
 

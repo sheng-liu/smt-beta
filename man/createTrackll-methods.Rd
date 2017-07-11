@@ -5,7 +5,7 @@
 \alias{createTrackll}
 \title{createTrackll}
 \usage{
-createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = parallel::detectCores(logical=F), censorSingle = F, frameRecord = T)
+createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
 }
 \arguments{
 \item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)}
