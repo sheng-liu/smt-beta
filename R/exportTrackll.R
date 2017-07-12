@@ -26,7 +26,7 @@
 
 ##' @param trackll a list of track lists
 ##' @param rowWise option to use Image-J style row-wise output in .csv files
-##' @param colWise optio to use Diatrack style col-wise output in .csv files
+##' @param colWise option to use Diatrack style col-wise output in .csv files
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
 ##' @param track.list a single track list
 
@@ -82,27 +82,34 @@
     
     #Confirmation text of function call
     cat("Writing .csv column-wise output in current directory for", getTrackFileName(track.list), "...\n");
-    
-    #Empty data frame df to be written into the .csv
-    df <- NULL;
+
+    frame.list <- list()
     
     #Loop through every trajectory in input track.list
     for (i in 1:length(track.list)){
         
-        #Create temporary data frame to be filled with transposed lists from track.list
-        temp <- NULL;
-        for (j in 1:3){
-            var <- data.frame(t(track.list[[i]][j]));
-            temp <- rbind(temp, var);
-        }
+        start.frame = getStartFrame(track.list[i])
         
-        #Append data frame df for .csv with temporary data frame
-        df <- rbind.fill(df, temp);
+        frame.list <- c(frame.list, start.frame, 0, 0)
+        
+        temp <- track.list[[i]][1:3]
+        
+        if (i != 1){
+            df <- cbind.fill(df, temp, fill = 0) 
+        } else {
+            df <- temp
+        }
     }
+    
+    colnames(df) <- frame.list
+    
+    header = "format (columnwise): Frame1 row n+1: (y(tn) x(tn) z(tn)), row n+1: (y(t(n+1)) x(t(n+1)) z(t(n+1))), row n+2: (y(t(n+2)) x(t(n+2) z(t(n+2)) y(t(n+3)).... where Frame1 is the frame number where the target is seen for the first time, and the columns define trajectories. Beware! the number of tracks is limited by the width of the widest text file on your machine. Rowwise export preferred"
 
     #Write the data frame df into the .csv and display confirmation text
     file.name = paste(getTrackFileName(track.list), "Col.csv", sep = "")
-    write.csv(df, file=file.name);
+    write(header, file = file.name, append = T)
+    write.table(df, file = file.name, row.names = FALSE, sep = "\t", append = T);
+    
     cat(paste(file.name, "placed in current directory.\n", sep =""))
 }
 

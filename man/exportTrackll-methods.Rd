@@ -19,7 +19,7 @@ exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
 
 \item{rowWise}{option to use Image-J style row-wise output in .csv files}
 
-\item{colWise}{optio to use Diatrack style col-wise output in .csv files}
+\item{colWise}{option to use Diatrack style col-wise output in .csv files}
 
 \item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
 }
