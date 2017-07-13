@@ -234,7 +234,7 @@ removeFrameRecord = function(track.list){
 
 #### readDiaSessions ####
 
-readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = T, frameRecord = T){
+readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
     
     trackll = list()
     track.holder = c()

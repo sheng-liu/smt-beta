@@ -20,6 +20,7 @@
 
 ##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)
 ##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)
+##' @param interact Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder)
 ##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
 ##' @param ab.track Use absolute coordinates for tracks
 ##' @param mask A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
@@ -41,6 +42,11 @@
 
 ##' @examples
 ##' 
+##' #Basic function call with interactive menu (optimzing 2 cores)
+##' trackll <- createTrackll(interact = T, cores = 2)
+##' 
+##' #Manual function call to process Diatrack session files (.mat) with censoring
+##' trackll <- createTrackll("/FILEPATH", input = 2, cores = 2, censorSingle = T)
 
 ##' @export createTrackll
 
@@ -51,12 +57,12 @@
 createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
     
     if (interact){
+        folder = dirname(file.choose());
         cat("Enter input file type and press ENTER: \n")
         cat("1. Diatrack .txt file \n")
         cat("2. Diatrack .mat session file: \n")
         cat("3. ImageJ .csv file \n")
         cat("4. SlimFast .txt file \n")
-
         input <- readline();
     }
 

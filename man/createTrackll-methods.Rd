@@ -12,6 +12,8 @@ createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F
 
 \item{input}{Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)}
 
+\item{interact}{Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder)}
+
 \item{merge}{An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.}
 
 \item{ab.track}{Use absolute coordinates for tracks}
@@ -41,4 +43,9 @@ NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a f
 }
 \examples{
 
+#Basic function call with interactive menu (optimzing 2 cores)
+trackll <- createTrackll(interact = T, cores = 2)
+
+#Manual function call to process Diatrack session files (.mat) with censoring
+trackll <- createTrackll("/FILEPATH", input = 2, cores = 2, censorSingle = T)
 }

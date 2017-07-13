@@ -121,12 +121,12 @@
 
     ##TODO, modify the macro to remove the last affix .tif in xxx.tif.csv
     # for now
-    file.subname=substr(file.name,
-                        start=nchar(file.name)-12,
-                        stop=nchar(file.name)-8)
-    #     file.subname=substr(file.name,
-    #                         start=nchar(file.name)-8,
-    #                         stop=nchar(file.name)-4)
+    
+    if (substr(file.name, start=nchar(file.name)-8,stop=nchar(file.name)-4) == ".tif"){
+        file.subname=substr(file.name, start=nchar(file.name)-12,stop=nchar(file.name)-8)
+    } else {
+        file.subname=substr(file.name, start=nchar(file.name)-8, stop=nchar(file.name)-4)
+    }
 
     # file.id
     file.id=rep(file.subname,length(duration))
