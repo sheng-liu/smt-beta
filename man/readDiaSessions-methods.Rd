@@ -6,7 +6,7 @@
 \alias{.readDiaSessions}
 \title{readDiaSessions}
 \usage{
-.readDiaSessions(file, interact = T, ab.track = F, censorSingle = T, frameRecord = T)
+.readDiaSessions(file, interact = T, ab.track = F, frameRecord = T)
 
 removeFrameRecord(track.list)
 }
@@ -16,8 +16,6 @@ removeFrameRecord(track.list)
 \item{interact}{Open menu to interactively choose file}
 
 \item{ab.track}{Use absolute coordinates for tracks}
-
-\item{censorSingle}{Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)}
 
 \item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
 }
@@ -39,17 +37,7 @@ The fourth column is simply removed from the given track list.
 #Basic function call of .readDiaSessions
 trackl <- .readDiaSessions(interact = T)
 
-#Function call of .readDiaSessions with censoring without a frame record
-trackl2 <- .readDiaSessions(interact = T, censorSingle = T, frameRecord = F)
-
 #Option to output .csv files after processing the track lists
 .exportRowWise(trackl)
-.exportColWise(trackl)
-
-#To find your current working directory
-getwd()
-
-#Remove default fourth frame record column
-trackll.removed <- removeFrameRecord(trackl)
 
 }

@@ -22,19 +22,22 @@
 ##' .exportRowWise(track.list)
 
 ##' @param trackll a list of track lists
-##' @param rowWise option to use Image-J/MOSAIC style row-wise output in .csv files
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
 ##' @param track.list a single track list
 
 ##' @details
+##' ##' The naming scheme for each export is as follows:
+##' 
+##' [yy-MM-dd]_[HH-mm-ss]_[Last five characters of the file name].csv
+##' 
 ##' The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves all information, while maintaining relatively short computation time and the ability to easily read it in Excel or etc.
 ##' 
 ##' In order to import this .csv export back into a trackll at any point (while preserving all information), select option input 3 in createTrackll.
 ##' 
-##' If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead
+##' If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead and will take longer
 ##' 
 ##' It is not recommended that exportTrackll be run on merged list of track lists (trackll).
-##'  Also, ensure that the input trackll is a list of track lists and not just a trackl track list
+##' Also, ensure that the input trackll is a list of track lists and not just a trackl track list
 
 ##' @export .exportRowWise
 ##' @export exportTrackll
@@ -48,27 +51,36 @@
     #Confirmation text of function call
     cat("\nWriting .csv row-wise output in current directory for", getTrackFileName(track.list), "...\n");
     
-    #Empty data frame df to be written into the .csv
-    df <- NULL;
+    #Collect track file name
+    track.file.name <- getTrackFileName(track.list);
     
-    #Loop through every trajectory in input track.list
-    for (i in 1:length(track.list)){
+    #Check for frame record column
+    if (ncol(track.list[[1]]) == 4){
         
-        #Create a data frame temp with trajectory, frame, and track coordinate data 
-        if (length(track.list[[i]]) == 4){
-            temp <- data.frame("Trajectory" = i, "Frame" = track.list[[i]][[4]], track.list[[i]][1:3]);
-        } else {
+        #Rename track list as trajectory numbers
+        names(track.list) <- c(1:length(track.list));
+        
+        #Combine track data frames by trajectory and reorder column
+        df <- bind_rows(track.list, .id = "Trajectory")[, c("Trajectory", "Frame", "x", "y", "z")]
+    
+    } else{
+        #Empty data frame df to be written into the .csv
+        df <- NULL;
+        
+        #Loop through every trajectory in input track.list
+        for (i in 1:length(track.list)){
+            
+            #Create a data frame temp with trajectory, frame, and track coordinate data 
             temp <- data.frame("Trajectory" = i, "Frame" = getStartFrame(track.list, i), track.list[[i]][1:3]);
+
+            #Append data frame df with data frame temp
+            df <- rbind(df, temp);
         }
-        
-        #Append data frame df with data frame temp
-        df <- rbind(df, temp);
     }
-    
     #Write the data frame df into the .csv and display confirmation text
-    file.name = paste(getTrackFileName(track.list), "_", format(Sys.time(), format = '%T'),"_ROW", ".csv", sep = "")
+    file.name = paste(format(Sys.time(), format = "%y-%m-%d_%H-%M-%S_"), track.file.name, ".csv", sep = "")
     write.csv(df, file=file.name);
-    cat(paste("\n", file.name, "placed in current directory.\n", sep =""))
+    cat(paste("\n", file.name, " placed in current directory.\n", sep =""))
 }
 
 #### .exportColWise ####

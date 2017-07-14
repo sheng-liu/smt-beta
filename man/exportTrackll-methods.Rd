@@ -6,33 +6,31 @@
 \alias{.exportRowWise}
 \title{exportTrackll}
 \usage{
-exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
+exportTrackll(trackll, cores = 1)
 
 .exportRowWise(track.list)
-
-.exportColWise(track.list)
 }
 \arguments{
 \item{track.list}{a single track list}
 
 \item{trackll}{a list of track lists}
 
-\item{rowWise}{option to use Image-J/MOSAIC style row-wise output in .csv files}
-
-\item{colWise}{option to use Diatrack style col-wise output in .csv files}
-
 \item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
 }
 \description{
-take in a list of track lists (trackll) and export it into row-wise and/or column-wise .csv files in the working directory
+take in a list of track lists (trackll) and export it into row-wise (ImageJ/MOSAIC) .csv files in the working directory
 }
 \details{
-For general saving purposes , it is recommended that the row-wise option be used, as it saves the entire frame record for every coordinate point in its entirety.
-Column-wise export only saves the starting frame for each track, and does not keep a record of any links at all. It is also much slower than row-wise export and is harder to visualize. 
-However, column wise export will preserve the exact data structure originally used for Diatrack .txt files.
+##' The naming scheme for each export uses the ISO 8601 format, as follows:
 
-For row-wise export, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
+[yy-MM-ddTHH-mm-ss][Last five characters of the file name].csv
+
+The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves all information, while maintaining relatively short computation time and the ability to easily read it in Excel or etc.
+
+In order to import this .csv export back into a trackll at any point (while preserving all information), select option input 3 in createTrackll.
+
+If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead
 
 It is not recommended that exportTrackll be run on merged list of track lists (trackll).
-Ensure that the input trackll is a list of track lists and not just a trackl track list
+Also, ensure that the input trackll is a list of track lists and not just a trackl track list
 }

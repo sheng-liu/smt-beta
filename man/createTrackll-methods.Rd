@@ -5,7 +5,7 @@
 \alias{createTrackll}
 \title{createTrackll}
 \usage{
-createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
+createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 }
 \arguments{
 \item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)}
@@ -21,8 +21,6 @@ createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F
 \item{mask}{A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.}
 
 \item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
-
-\item{censorSingle}{Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)}
 
 \item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
 }
@@ -46,6 +44,6 @@ Track: [Last five characters of the file name].[Start frame].[Length].[Track].[I
 #Basic function call with interactive menu (optimzing 2 cores)
 trackll <- createTrackll(interact = T, cores = 2)
 
-#Manual function call to process Diatrack session files (.mat) with censoring
-trackll <- createTrackll("/FILEPATH", input = 2, cores = 2, censorSingle = T)
+#Manual function call to process Diatrack session files (.mat)
+trackll <- createTrackll("/FILEPATH", input = 2, cores = 2)
 }

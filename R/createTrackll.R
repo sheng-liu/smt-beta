@@ -16,7 +16,7 @@
 ##' @description take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a folder to output a list of track lists with the option to merge, mask, censor, record frames, and use multiple cores.
 
 ##' @usage 
-##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T)
+##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 
 ##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)
 ##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)
@@ -25,7 +25,6 @@
 ##' @param ab.track Use absolute coordinates for tracks
 ##' @param mask A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
-##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @details
@@ -45,8 +44,8 @@
 ##' #Basic function call with interactive menu (optimzing 2 cores)
 ##' trackll <- createTrackll(interact = T, cores = 2)
 ##' 
-##' #Manual function call to process Diatrack session files (.mat) with censoring
-##' trackll <- createTrackll("/FILEPATH", input = 2, cores = 2, censorSingle = T)
+##' #Manual function call to process Diatrack session files (.mat)
+##' trackll <- createTrackll("/FILEPATH", input = 2, cores = 2)
 
 ##' @export createTrackll
 
@@ -54,7 +53,7 @@
 
 ### createTrackll ###
 
-createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
+createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T){
     
     if (interact){
         folder = dirname(file.choose());
@@ -109,13 +108,13 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
         for (i in 1:length(file.list)){
 
             if (input == 1){
-                track.list = .readDiatrack(file=file.list[i],ab.track=ab.track)
+                track.list = .readDiatrack(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
             } else if (input == 2){
-                track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+                track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
             } else if (input == 3){
                 track.list = .readParticleTracker(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
             } else if (input == 4){
-                track.list = .readSlimFast(file = file.list[i], ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+                track.list = .readSlimFast(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
             }
             
             # add indexPerTrackll to track name
@@ -145,26 +144,26 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
         
         # pass environment variables to workers
         if (input == 1){
-            parallel::clusterExport(cl,varlist=c(".readDiatrack","ab.track"),envir=environment())
+            parallel::clusterExport(cl,varlist=c(".readDiatrack","ab.track", "frameRecord"),envir=environment())
         } else if (input == 2){
-            parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "censorSingle", "frameRecord"),envir=environment())
+            parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "frameRecord"),envir=environment())
         } else if (input == 3){
             parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track", "frameRecord"),envir=environment())
         } else if (input == 4){
-            parallel::clusterExport(cl,varlist=c(".readSlimFast","ab.track", "censorSingle", "frameRecord"),envir=environment())
+            parallel::clusterExport(cl,varlist=c(".readSlimFast","ab.track", "frameRecord"),envir=environment())
         }    
         
         # trackll=parallel::parLapply(cl,file.list,function(fname){
         trackll=parallel::parLapply(cl,file.list,function(fname){
 
             if (input == 1){
-                track.list = .readDiatrack(file=fname,ab.track=ab.track)
+                track.list = .readDiatrack(file=fname,ab.track=ab.track, frameRecord = frameRecord)
             } else if (input == 2){
-                track.list = .readDiaSessions(file = fname, ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+                track.list = .readDiaSessions(file = fname, ab.track = ab.track, frameRecord = frameRecord)
             } else if (input == 3){
                 track.list = .readParticleTracker(file=fname,ab.track=ab.track, frameRecord=frameRecord)
             } else if (input == 4){
-                track.list = .readSlimFast(file = fname, ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+                track.list = .readSlimFast(file = fname, ab.track = ab.track, frameRecord = frameRecord)
             }
 
             # add indexPerTrackll to track name

@@ -6,7 +6,7 @@
 \alias{.readSlimFast}
 \title{readSlimFast}
 \usage{
-.readSlimFast(file, interact = F,  ab.track = F, censorSingle = F, frameRecord = T)
+.readSlimFast(file, interact = F,  ab.track = F, frameRecord = T)
 }
 \arguments{
 \item{file}{Full path to SlimFast .txt session file}
@@ -14,8 +14,6 @@
 \item{interact}{Open menu to interactively choose file}
 
 \item{ab.track}{Use absolute coordinates for tracks}
-
-\item{censorSingle}{Remove and censor trajectories that appear for only one frame}
 
 \item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
 }
@@ -33,17 +31,7 @@ The naming scheme for each track is as follows:
 #Basic function call of .readSlimFast
 trackl <- .readSlimFast(interact = T)
 
-#Function call of .readSlimFast with censoring without a frame record and output to .csv files
-trackl2 <- .readSlimFast(interact = T, censorSingle = T, frameRecord = F)
-
 #Option to output .csv files after processing the track lists
 .exportRowWise(trackl)
-.exportColWise(trackl)
-
-#To find your current working directory
-getwd()
-
-#Remove default fourth frame record column
-trackll.removed <- removeFrameRecord(trackl)
 
 }

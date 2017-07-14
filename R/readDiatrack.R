@@ -19,6 +19,7 @@
 ##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
 ##' @param mask An logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
+##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @return
 ##' \itemize{
@@ -76,7 +77,7 @@
 ## .readDiatrack
 ## a function to read one diatrack txt file and returns a list of tracks
 
-.readDiatrack=function(file, interact=F,ab.track=F){
+.readDiatrack=function(file, interact=F,ab.track=F, frameRecord = T){
 
     # interactively open window
     if (interact==T) {
@@ -94,6 +95,10 @@
 
     ## remove frame number line for computation
     data=data[-1,]
+    
+    # frame.id
+    frame.num.mx=matrix(frame.num,ncol=3,nrow=length(frame.num)/3,byrow=T)
+    frame.id=unlist(frame.num.mx[,1])
 
     ## process the data
     # store coordinates of track in track.list
@@ -115,7 +120,11 @@
         track=dplyr::select(data,(triple-3+1):triple)
         colnames(track)=c("x","y","z")
         track=dplyr::filter(track,x!=0,y!=0)
-
+        
+        if (frameRecord){
+            track <- cbind(track, "Frame" = c(frame.id[[i]]:(frame.id[[i]]+nrow(track)-1)))
+        }
+        
         # the [[]] is important, otherwise only x is included
         track.list[[i]]=track
 
@@ -133,10 +142,6 @@
     }
 
     ## name the tracks
-
-    # frame.id
-    frame.num.mx=matrix(frame.num,ncol=3,nrow=length(frame.num)/3,byrow=T)
-    frame.id=unlist(frame.num.mx[,1])
 
     # duration
 
@@ -298,7 +303,7 @@ maskTracks=function(trackll,maskl){
 # correspondingly. as it is read into two list, file.list, and mask.list. there
 # is not direct comparison of file name function add in yet in v0.3.4
 
-readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1){
+readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1, frameRecord = T){
 
     trackll=list()
     track.holder=c()
@@ -328,7 +333,7 @@ readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1){
 
         for (i in 1:length(file.list)){
 
-            track=.readDiatrack(file=file.list[i],ab.track=ab.track)
+            track=.readDiatrack(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
 
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
@@ -356,11 +361,11 @@ readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1){
         parallel::setDefaultCluster(cl)
 
         # pass environment variables to workers
-        parallel::clusterExport(cl,varlist=c(".readDiatrack","ab.track"),envir=environment())
+        parallel::clusterExport(cl,varlist=c(".readDiatrack","ab.track", "frameRecord"),envir=environment())
 
         # trackll=parallel::parLapply(cl,file.list,function(fname){
         trackll=parallel::parLapply(cl,file.list,function(fname){
-            track=.readDiatrack(file=fname,ab.track=ab.track)
+            track=.readDiatrack(file=fname,ab.track=ab.track, framerecord = frameRecord)
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
             names(track)=mapply(paste,names(track),indexPerTrackll,sep=".")

@@ -123,7 +123,7 @@
     ##TODO, modify the macro to remove the last affix .tif in xxx.tif.csv
     # for now
     
-    if (substr(file.name, start=nchar(file.name)-8,stop=nchar(file.name)-4) == ".tif"){
+    if (substr(file.name, start=nchar(file.name)-7,stop=nchar(file.name)-4) == ".tif"){
         file.subname=substr(file.name, start=nchar(file.name)-12,stop=nchar(file.name)-8)
     } else {
         file.subname=substr(file.name, start=nchar(file.name)-8, stop=nchar(file.name)-4)
@@ -145,7 +145,7 @@
         subset.df=function(df){df[,c("x","y","z", "Frame")]}
         track.list=lapply(track.list,subset.df)
     } else {
-        subset.df=function(df){df[,c("Frame", "x","y","z")]}
+        subset.df=function(df){df[,c("x","y","z")]}
         track.list=lapply(track.list,subset.df) 
     }
 

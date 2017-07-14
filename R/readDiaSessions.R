@@ -16,7 +16,7 @@
 ##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
                                          
 ##' @usage 
-##' .readDiaSessions(file, interact = T, ab.track = F, censorSingle = T, frameRecord = T)
+##' .readDiaSessions(file, interact = T, ab.track = F, frameRecord = T)
 ##'
 ##' removeFrameRecord(track.list)
 ##' 
@@ -24,7 +24,6 @@
 ##' @param file Full path to Diatrack .mat session file
 ##' @param interact Open menu to interactively choose file
 ##' @param ab.track Use absolute coordinates for tracks
-##' @param censorSingle Remove and censor trajectories that do not have a recorded next/previous frame (trajectories that appear for only one frame)
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @details
@@ -42,19 +41,9 @@
 ##' @examples
 ##' #Basic function call of .readDiaSessions
 ##' trackl <- .readDiaSessions(interact = T)
-##'
-##' #Function call of .readDiaSessions with censoring without a frame record
-##' trackl2 <- .readDiaSessions(interact = T, censorSingle = T, frameRecord = F)
 ##' 
 ##' #Option to output .csv files after processing the track lists
 ##' .exportRowWise(trackl)
-##' .exportColWise(trackl)
-##' 
-##' #To find your current working directory
-##' getwd()
-##' 
-##' #Remove default fourth frame record column
-##' trackll.removed <- removeFrameRecord(trackl)
 ##' 
 
 ##' @export .readDiaSessions
@@ -81,7 +70,7 @@
 #Automating this process using "matlabr" resulted in 4488 censored tracks (should be 4487 tracks since the script does not censor first frame) in 3:48 mins.
 
 #Using readDiaSessions, the intermediate .txt file was no longer needed to be created and the session file directly results in track lists.
-#This script resulted in 4487 censored tracks in 2:00 mins and 34689 uncensored tracks in 2:01 mins. 
+#This script resulted in 34689 uncensored tracks in 2:01 mins. 
 
 #### readDiaSessions ####
 
@@ -89,7 +78,7 @@
 #install.packages("R.matlab")
 #library(R.matlab)
 
-.readDiaSessions = function(file, interact = F, ab.track = F, censorSingle = F, frameRecord = T){
+.readDiaSessions = function(file, interact = F, ab.track = F, frameRecord = T){
     
     #Interactively open window
     if (interact == TRUE) {
@@ -184,24 +173,20 @@
                 break;
         }
         
-        #Check for censoring tracks that appear for only frame
-        if (!censorSingle || nrow(track) != 1){
+        #Add start frame to frame list
+        frame.list[[length(frame.list) + 1]] <- startFrame;
             
-            #Add start frame to frame list
-            frame.list[[length(frame.list) + 1]] <- startFrame;
+        #Add track length to length list
+        length.list[[length(length.list) + 1]] <- nrow(track);
             
-            #Add track length to length list
-            length.list[[length(length.list) + 1]] <- nrow(track);
-            
-            #Calcualte absolute track coordinates if desired
-            if (ab.track){
-                track <- abTrack(track);
-            }
-            
-            #Append temporary track for particle into track list and iterate to the next trajectory
-            track.list[[trajectoryIndex]] <- track;
-            trajectoryIndex = trajectoryIndex + 1;
+        #Calcualte absolute track coordinates if desired
+        if (ab.track){
+            track <- abTrack(track);
         }
+        
+        #Append temporary track for particle into track list and iterate to the next trajectory
+        track.list[[trajectoryIndex]] <- track;
+        trajectoryIndex = trajectoryIndex + 1;
     }
     #Name track list:
     #[Last five characters of the file name without extension (cannot contain ".")].[Start frame #].[Length].[Track #]
@@ -234,7 +219,7 @@ removeFrameRecord = function(track.list){
 
 #### readDiaSessions ####
 
-readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1, censorSingle = F, frameRecord = T){
+readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T){
     
     trackll = list()
     track.holder = c()
@@ -264,7 +249,7 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
         
         for (i in 1:length(file.list)){
             
-            track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+            track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
             
             # add indexPerTrackll to track name
             indexPerTrackll = 1:length(track.list)
@@ -292,11 +277,11 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
         parallel::setDefaultCluster(cl)
         
         # pass environment variables to workers
-        parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "censorSingle", "frameRecord"),envir=environment())
+        parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "frameRecord"),envir=environment())
         
         # trackll=parallel::parLapply(cl,file.list,function(fname){
         trackll=parallel::parLapply(cl,file.list,function(fname){
-            track=.readDiaSessions(file=fname,ab.track=ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
+            track=.readDiaSessions(file=fname,ab.track=ab.track, frameRecord = frameRecord)
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
             names(track)=mapply(paste,names(track),indexPerTrackll,sep=".")
