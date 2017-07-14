@@ -172,10 +172,10 @@
             RefinedCooX = round(data[frame][[1]][[1]][[2]][[index]], 2);
             RefinedCooY = round(data[frame][[1]][[1]][[1]][[index]], 2);
             RefinedCooZ = round(data[frame][[1]][[1]][[3]][[index]], digits = 1);
-            if (!frameRecord){
-                track <- rbind(track, data.frame(x = RefinedCooX, y = RefinedCooY, z = RefinedCooZ));
+            if (frameRecord){
+                track <- rbind(track, data.frame(x = RefinedCooX, y = RefinedCooY, z = RefinedCooZ, Frame = frame));
             } else {
-                track <- rbind(track, data.frame(x = RefinedCooX, y = RefinedCooY, z = RefinedCooZ, frame = frame));
+                track <- rbind(track, data.frame(x = RefinedCooX, y = RefinedCooY, z = RefinedCooZ));
             }
             if (data[frame][[1]][[1]][[7]][[index]] != 0) {
                 index = data[frame][[1]][[1]][[7]][[index]];
@@ -245,12 +245,12 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
     folder.name=basename(folder)
     
     # read in mask
-    #mask.list=list.files(path=folder,pattern="_MASK.tif",full.names=T)
+    mask.list=list.files(path=folder,pattern="_MASK.tif",full.names=T)
     
-    #if (mask==T & length(mask.list)==0){
-    #    cat("No image mask file ending '_MASK.tif' found.\n")
+    if (mask==T & length(mask.list)==0){
+        cat("No image mask file ending '_MASK.tif' found.\n")
         
-    #}
+    }
     
     
     # read in tracks
@@ -313,103 +313,43 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
     }
     
     # cleaning tracks by image mask
-    #if (mask==T){
-    #    trackll=maskTracks(trackll=trackll,maskl=mask.list)
-    #}
+    if (mask==T){
+        trackll=maskTracks(trackll=trackll,maskl=mask.list)
+    }
     
     # merge masked tracks
     # merge has to be done after mask
     
     
-    # if (merge==T){
-    #     for (i in 1:length(file.list)){
-    #         trackll[[i]]=track[[i]]
-    #         names(trackll)[i]=file.name[i]
-    #     }
-    # }
-    
-    
-    # trackll naming scheme
-    # if merge==F, list takes the name of individual file name within folder
-    # file.name > data.frame.name
-    # if merge==T, list takes the folder name
-    # folder.name > data.frame.name
-    
-    # filtration by image mask
-    #if (mask==T){
-    #    trackll=maskTracks(trackll=trackll,maskl=mask.list)
-    #}
-    
-    # merge masked tracks
-    # merge has to be done after mask
-    
-    #if (merge==T){
+    if (merge==T){
         
-        # trackll naming scheme
-        # if merge==F, list takes the name of individual file name within folder
-        # file.name > data.frame.name
-        # if merge==T, list takes the folder name
-        # folder.name > data.frame.name
         
         # concatenate track list into one list of data.frames
-        #for (i in 1:length(file.list)){
-        #    track.holder=c(track.holder,trackll[[i]])
-        #}
+        for (i in 1:length(file.list)){
+            track.holder=c(track.holder,trackll[[i]])
+        }
         
         # rename indexPerTrackll of index
         # extrac index
-        #Index=strsplit(names(track.holder),split="[.]")  # split="\\."
+        Index=strsplit(names(track.holder),split="[.]")  # split="\\."
         
         # remove the last old indexPerTrackll
-        #Index=lapply(Index,function(x){
-            #x=x[1:(length(x)-1)]
-            #x=paste(x,collapse=".")})
+        Index=lapply(Index,function(x){
+            x=x[1:(length(x)-1)]
+            x=paste(x,collapse=".")})
         
         # add indexPerTrackll to track name
-        #indexPerTrackll=1:length(track.holder)
-        #names(track.holder)=mapply(paste,Index,
-                                   #indexPerTrackll,sep=".")
+        indexPerTrackll=1:length(track.holder)
+        names(track.holder)=mapply(paste,Index,
+                                   indexPerTrackll,sep=".")
         
         # make the result a list of list with length 1
-        #trackll=list()
-        #trackll[[1]]=track.holder
-        #names(trackll)[[1]]=folder.name
+        trackll=list()
+        trackll[[1]]=track.holder
+        names(trackll)[[1]]=folder.name
         
         # trackll=track.holder
-    #}
-    
-    #     }else{
-    #
-    #         # list of list of data.frames,
-    #         # first level list of folder names and
-    #         # second level list of data.frames
-    #
-    #         for (i in 1:length(file.list)){
-    #
-    #             track=.readDiatrack(file=file.list[i],ab.track=ab.track)
-    #             # concatenate tracks into one list of data.frames
-    #             track.holder=c(track.holder,track)
-    #
-    #         }
-    #
-    #         # add indexPerTrackll to track name
-    #         indexPerTrackll=1:length(track.holder)
-    #
-    #         names(track.holder)=mapply(paste,names(track.holder),
-    #                                    indexPerTrackll,sep=".")
-    #
-    #         # make the result a list of list with length 1
-    #         trackll[[1]]=track.holder
-    #         names(trackll)[[1]]=folder.name
-    #
-    
-    #
-    #
-    #         if (mask==T){
-    #             trackll=maskTracks(trackll,mask.list)
-    #         }
-    #
-    #     }
+    }
     
     return(trackll)
 }

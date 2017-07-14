@@ -29,19 +29,19 @@
 ##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @details
+##' It is highly advised that the frame record option be left on to preserve the most information, especially when linking frames.
+##' 
 ##' NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
 ##'
-##'  The naming scheme for the list of track list is as follows:
+##' The naming scheme for the list of track list is as follows:
 ##'  
-##'  Track List: [full name of input file]
-##'  Track: 
-##' 
-##' [Last five characters of the file name].[Start frame #].[Length].[Track #].[Index # (will differ from Track # when merging)]
+##' Track List: [full name of input file]
+##'  
+##' Track: [Last five characters of the file name].[Start frame].[Length].[Track].[Index in overall list (will differ from Track # when merging)]
 ##' 
 ##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
 
 ##' @examples
-##' 
 ##' #Basic function call with interactive menu (optimzing 2 cores)
 ##' trackll <- createTrackll(interact = T, cores = 2)
 ##' 
@@ -113,7 +113,7 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
             } else if (input == 2){
                 track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
             } else if (input == 3){
-                track.list = .readParticleTracker(file=file.list[i],ab.track=ab.track)
+                track.list = .readParticleTracker(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
             } else if (input == 4){
                 track.list = .readSlimFast(file = file.list[i], ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
             }
@@ -149,7 +149,7 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
         } else if (input == 2){
             parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "censorSingle", "frameRecord"),envir=environment())
         } else if (input == 3){
-            parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track"),envir=environment())
+            parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track", "frameRecord"),envir=environment())
         } else if (input == 4){
             parallel::clusterExport(cl,varlist=c(".readSlimFast","ab.track", "censorSingle", "frameRecord"),envir=environment())
         }    
@@ -162,7 +162,7 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
             } else if (input == 2){
                 track.list = .readDiaSessions(file = fname, ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
             } else if (input == 3){
-                track.list = .readParticleTracker(file=fname,ab.track=ab.track)
+                track.list = .readParticleTracker(file=fname,ab.track=ab.track, frameRecord=frameRecord)
             } else if (input == 4){
                 track.list = .readSlimFast(file = fname, ab.track = ab.track, censorSingle = censorSingle, frameRecord = frameRecord)
             }

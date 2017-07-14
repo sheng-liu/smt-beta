@@ -19,6 +19,7 @@
 ##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
 ##' @param mask An logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
+##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
 
 ##' @return
 ##' \itemize{
@@ -79,7 +80,7 @@
 ## .readParticleTracker
 ## a function to read ParticleTracker (a program of ImageJ plugin MosaicSuit) output .csv file and returns a list of tracks
 
-.readParticleTracker=function(file,interact=F,ab.track=F){
+.readParticleTracker=function(file,interact=F,ab.track=F, frameRecord=T){
 
     # interactively open window
     if (interact==T) {
@@ -140,9 +141,13 @@
     names(track.list)=track.name
 
     # remove columns
-    subset.df=function(df){df[,c("x","y","z")]}
-    track.list=lapply(track.list,subset.df)
-
+    if (frameRecord){
+        subset.df=function(df){df[,c("x","y","z", "Frame")]}
+        track.list=lapply(track.list,subset.df)
+    } else {
+        subset.df=function(df){df[,c("Frame", "x","y","z")]}
+        track.list=lapply(track.list,subset.df) 
+    }
 
     # convert normal trackll to ab.trackll for plotting
     # can be paralleled
@@ -166,7 +171,7 @@
 
 }
 
-readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1){
+readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1, frameRecord=T){
 
     trackll=list()
     track.holder=c()
@@ -200,7 +205,7 @@ readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1){
 
         for (i in 1:length(file.list)){
 
-            track=.readParticleTracker(file=file.list[i],ab.track=ab.track)
+            track=.readParticleTracker(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
 
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
@@ -225,10 +230,10 @@ readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1){
         parallel::setDefaultCluster(cl)
 
         # pass environment variables to workers
-        parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track"),envir=environment())
+        parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track", "frameRecord"),envir=environment())
 
         trackll=parallel::parLapply(cl,file.list,function(fname){
-            track=.readParticleTracker(file=fname,ab.track=ab.track)
+            track=.readParticleTracker(file=fname,ab.track=ab.track, frameRecord = frameRecord)
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
             names(track)=mapply(paste,names(track),indexPerTrackll,sep=".")

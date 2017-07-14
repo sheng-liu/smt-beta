@@ -17,7 +17,7 @@ exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
 
 \item{trackll}{a list of track lists}
 
-\item{rowWise}{option to use Image-J style row-wise output in .csv files}
+\item{rowWise}{option to use Image-J/MOSAIC style row-wise output in .csv files}
 
 \item{colWise}{option to use Diatrack style col-wise output in .csv files}
 
@@ -27,9 +27,12 @@ exportTrackll(trackll, rowWise = T, colWise = T, cores = 1)
 take in a list of track lists (trackll) and export it into row-wise and/or column-wise .csv files in the working directory
 }
 \details{
-For .exportRowWise, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
+For general saving purposes , it is recommended that the row-wise option be used, as it saves the entire frame record for every coordinate point in its entirety.
+Column-wise export only saves the starting frame for each track, and does not keep a record of any links at all. It is also much slower than row-wise export and is harder to visualize. 
+However, column wise export will preserve the exact data structure originally used for Diatrack .txt files.
+
+For row-wise export, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
 
 It is not recommended that exportTrackll be run on merged list of track lists (trackll).
-
 Ensure that the input trackll is a list of track lists and not just a trackl track list
 }

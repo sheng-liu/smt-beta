@@ -25,16 +25,19 @@
 ##' 
 
 ##' @param trackll a list of track lists
-##' @param rowWise option to use Image-J style row-wise output in .csv files
+##' @param rowWise option to use Image-J/MOSAIC style row-wise output in .csv files
 ##' @param colWise option to use Diatrack style col-wise output in .csv files
 ##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
 ##' @param track.list a single track list
 
 ##' @details
-##' For .exportRowWise, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
+##' For general saving purposes , it is recommended that the row-wise option be used, as it saves the entire frame record for every coordinate point in its entirety.
+##' Column-wise export only saves the starting frame for each track, and does not keep a record of any links at all. It is also much slower than row-wise export and is harder to visualize. 
+##' However, column wise export will preserve the exact data structure originally used for Diatrack .txt files.
+##' 
+##' For row-wise export, if the track list does not have a fourth frame record column, it will just output the start frame of each track instead
 ##' 
 ##' It is not recommended that exportTrackll be run on merged list of track lists (trackll).
-##' 
 ##' Ensure that the input trackll is a list of track lists and not just a trackl track list
 
 ##' @export .exportRowWise
@@ -71,7 +74,7 @@
     }
     
     #Write the data frame df into the .csv and display confirmation text
-    file.name = paste("ROW", getTrackFileName(track.list), ".csv", sep = "")
+    file.name = paste(getTrackFileName(track.list), "_", format(Sys.time(), format = '%T'),"_ROW", ".csv", sep = "")
     write.csv(df, file=file.name);
     cat(paste("\n", file.name, "placed in current directory.\n", sep =""))
 }

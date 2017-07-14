@@ -30,19 +30,19 @@ createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F
 take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a folder to output a list of track lists with the option to merge, mask, censor, record frames, and use multiple cores.
 }
 \details{
+It is highly advised that the frame record option be left on to preserve the most information, especially when linking frames.
+
 NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
 
- The naming scheme for the list of track list is as follows:
+The naming scheme for the list of track list is as follows:
  
- Track List: [full name of input file]
- Track: 
-
-[Last five characters of the file name].[Start frame #].[Length].[Track #].[Index # (will differ from Track # when merging)]
+Track List: [full name of input file]
+ 
+Track: [Last five characters of the file name].[Start frame].[Length].[Track].[Index in overall list (will differ from Track # when merging)]
 
 (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
 }
 \examples{
-
 #Basic function call with interactive menu (optimzing 2 cores)
 trackll <- createTrackll(interact = T, cores = 2)
 
