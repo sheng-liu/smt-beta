@@ -64,7 +64,7 @@
     file.name = getTrackFileName(track.list);
     
     #Confirmation text of function call
-    cat("Linking", file.name, "...\n");
+    cat("\nLinking", file.name, "...\n");
     
     #Instantiate empty linked track list
     track.list.linked = list();
@@ -166,7 +166,7 @@
     names(track.list.linked) = paste(file.subname, frame.list, length.list, c(1:length(track.list.linked)), linknum.list, sep=".");
     
     #Return linked track list and confirmation text
-    cat(Reduce("+", linknum.list), "links found in", file.name, "\n\n");
+    cat("\n", Reduce("+", linknum.list), "links found in", file.name, "\n");
     
     return (track.list.linked);
 }
@@ -205,9 +205,10 @@ linkSkippedFrames = function(trackll, tolerance, maxSkip, cores = 1){
         })
         
         # stop cluster
-        cat("Stopping clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
     }
+    cat("\nProcess complete.\n")
     return (link.trackll);
     
 }

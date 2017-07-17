@@ -173,7 +173,7 @@ exportTrackll = function(trackll, cores = 1){
         })
         
         # stop cluster
-        cat("Stopping clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
     }
     

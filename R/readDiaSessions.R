@@ -188,8 +188,8 @@
     #[Last five characters of the file name without extension (cannot contain ".")].[Start frame #].[Length].[Track #]
     names(track.list) = paste(file.subname, frame.list, length.list, c(1:length(track.list)), sep=".");
     
-    #File read and processedconfirmation text
-    cat("\nSession file read and processed.\n")
+    #File read and processed confirmation text
+    cat("\n", file.subname, "read and processed.\n")
     
     #Display stop timer
     #if (timer == TRUE) {
@@ -276,7 +276,7 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
         })
         
         # stop cluster
-        cat("Stopping clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
         
         names(trackll)=file.name
@@ -323,5 +323,6 @@ readDiaSessions = function(folder, merge = F, ab.track = F, mask = F, cores = 1,
         # trackll=track.holder
     }
     
+    cat("\nProcess complete.\n")
     return(trackll)
 }

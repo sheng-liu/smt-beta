@@ -129,6 +129,7 @@
     #[Last five characters of the file name without extension (cannot contain ".")].[Start frame #].[Length].[Track #]
     names(track.list) = paste(file.subname, frame.list, length.list, c(1:length(track.list)), sep=".");
     
+    cat("\n", file.subname, "read and processed.\n")
     #Return track list
     return (track.list);
 }
@@ -205,7 +206,7 @@ readSlimFast = function(folder, merge = F, ab.track = F, mask = F, cores = 1, fr
         })
         
         # stop cluster
-        cat("Stopping clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
         
         names(trackll)=file.name
@@ -251,6 +252,6 @@ readSlimFast = function(folder, merge = F, ab.track = F, mask = F, cores = 1, fr
         
         # trackll=track.holder
     }
-    
+    cat("\nProcess complete.\n")
     return(trackll)
 }

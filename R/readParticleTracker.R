@@ -161,12 +161,9 @@
                        y=track$y-min(track$y))
         }
         ab.track.list=lapply(track.list,abTrack)
-
-        return(ab.track.list)
     }
 
-    return(track.list)
-
+    cat("\n", file.subname, "read and processed.\n")
     if (ab.track==T) return(ab.track.list) else return(track.list)
 
 }
@@ -241,7 +238,7 @@ readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1, frameRec
         })
 
         # stop cluster
-        cat("Stop clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
 
         names(trackll)=file.name
@@ -286,7 +283,7 @@ readParticleTracker=function(folder,merge= F,ab.track=F,mask=F,cores=1, frameRec
 
         # trackll=track.holder
     }
-
+    cat("\nProcess complete.\n")
     return(trackll)
 }
 

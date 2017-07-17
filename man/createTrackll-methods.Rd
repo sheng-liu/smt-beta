@@ -5,14 +5,14 @@
 \alias{createTrackll}
 \title{createTrackll}
 \usage{
-createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
+createTrackll(interact = F, folder, input = 0, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 }
 \arguments{
+\item{interact}{Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder).}
+
 \item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast).}
 
 \item{input}{Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4).}
-
-\item{interact}{Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder).}
 
 \item{merge}{Indicate if the output list should be merged into one- output list is divided by file names otherwise.}
 
@@ -29,8 +29,16 @@ take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a 
 }
 \details{
 It is highly advised that the frame record option be left on to preserve the most information, especially when linking frames.
+If the frame record option is turned on for reading Diatrack .txt filed (input = 1), take note that the frame record is artificially created as consecutive frames after the given start frame.
+Otherwise, all other data types naturally record the frames of every coordinate point.
+
+NOTE: The pre-censoring of single-frame tracks is dependent on the tracking software. For complete lossless track data, use Diatrack (.mat) session files.
 
 NOTE: If the initial creation of the trackll does not have a frame record, future exports and imports of the trackll will only preserve the start frames.
+
+NOTE: If the cores are set to the maximum number of cores available on the system, the script may return a error after processing all the files. 
+This error is due to the requirement of some systems to have one core open for system functions. 
+This error will not affect the trackll output, but to avoid it, one can input one less than the maximum number of cores available.
 
 The naming scheme for the list of track list is as follows:
  

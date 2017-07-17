@@ -166,6 +166,7 @@
     names(track.list)=track.name
     names(ab.track.list)=track.name
 
+    cat("\n", file.subname, "read and processed.\n")
     if (ab.track==T) return(ab.track.list) else return(track.list)
 
 }
@@ -365,7 +366,7 @@ readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1, frameRecord = T)
 
         # trackll=parallel::parLapply(cl,file.list,function(fname){
         trackll=parallel::parLapply(cl,file.list,function(fname){
-            track=.readDiatrack(file=fname,ab.track=ab.track, framerecord = frameRecord)
+            track=.readDiatrack(file=fname,ab.track=ab.track, frameRecord = frameRecord)
             # add indexPerTrackll to track name
             indexPerTrackll=1:length(track)
             names(track)=mapply(paste,names(track),indexPerTrackll,sep=".")
@@ -373,7 +374,7 @@ readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1, frameRecord = T)
         })
 
         # stop cluster
-        cat("Stop clusters...\n")
+        cat("\nStopping clusters...\n")
         parallel::stopCluster(cl)
 
         names(trackll)=file.name
@@ -479,7 +480,7 @@ readDiatrack=function(folder,merge=F,ab.track=F,mask=F,cores=1, frameRecord = T)
     #         }
     #
     #     }
-
+    cat("\nProcess complete.\n")
     return(trackll)
 }
 
