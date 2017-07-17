@@ -160,3 +160,17 @@ abTrack = function(track){
     min.y = min(track$y);
     return(data.frame(x=track$x-min.x, y=track$y-min.y));
 }
+##------------------------------------------------------------------------------
+## removeFrameRecord
+# remove frame record for backwards compatibility
+
+#PARAMETERS: 
+#track.list = track list with frame record in the fourth column
+    
+##'@export removeFrameRecord
+removeFrameRecord = function(track.list){
+    for (i in 1:length(track.list)){
+        track.list[[i]] <- track.list[[i]][-c(4)];
+    }
+    return (track.list);
+}

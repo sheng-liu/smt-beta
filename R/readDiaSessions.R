@@ -16,15 +16,18 @@
 ##' @description take in a Diatrack .mat session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories found in the session file
                                          
 ##' @usage 
-##' .readDiaSessions(file, interact = T, ab.track = F, frameRecord = T)
-##'
-##' removeFrameRecord(track.list)
+##' readDiaSessions(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 ##' 
+##' .readDiaSessions(file, interact = T, ab.track = F, frameRecord = T)
 
-##' @param file Full path to Diatrack .mat session file
-##' @param interact Open menu to interactively choose file
-##' @param ab.track Use absolute coordinates for tracks
-##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
+##' @param folder Full path Diatrack .mat session files output folder.
+##' @param merge Indicate if the output list should be merged into one- output list is divided by file names otherwise.
+##' @param ab.track Use absolute coordinates for tracks.
+##' @param mask Indicate if image mask should be applied to screen tracks (Note: the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks).
+##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.
+##' @param frameRecord Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames).
+##' @param file Full path to Diatrack .mat session file.
+##' @param interact Open menu to interactively choose file.
 
 ##' @details
 ##' The naming scheme for each track is as follows:
@@ -32,22 +35,15 @@
 ##' [Last five characters of the file name].[Start frame #].[Length].[Track #]
 ##' 
 ##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
-##' 
-##' removeFrameRecord is a helper script aims to make track lists with a fourth frame record column backwards compatible 
-##' with other smt functions that rely on track lists with only three columns for the xyz-coordinates. 
-##' The fourth column is simply removed from the given track list.
-##'
 
 ##' @examples
 ##' #Basic function call of .readDiaSessions
+##' trackll <- readDiaSessions(folder = /FILEPATH/, cores = 2)
+##' 
+##' #Basic function call of .readDiaSessions
 ##' trackl <- .readDiaSessions(interact = T)
-##' 
-##' #Option to output .csv files after processing the track lists
-##' .exportRowWise(trackl)
-##' 
 
 ##' @export .readDiaSessions
-##' @export removeFrameRecord
 ##' @export readDiaSessions
 
 ##' @importFrom R.matlab readMat
@@ -207,15 +203,6 @@
     #Return track list
     return(track.list);
 } 
-
-#### removeFrameRecord ####
-
-removeFrameRecord = function(track.list){
-    for (i in 1:length(track.list)){
-        track.list[[i]] <- track.list[[i]][-c(4)];
-    }
-    return (track.list);
-}
 
 #### readDiaSessions ####
 

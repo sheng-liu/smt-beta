@@ -11,26 +11,40 @@ exportTrackll(trackll, cores = 1)
 .exportRowWise(track.list)
 }
 \arguments{
-\item{track.list}{a single track list}
+\item{track.list}{A track list (a list of trajectory data frames).}
 
-\item{trackll}{a list of track lists}
+\item{trackll}{A list of track lists.}
 
-\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
+\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.}
 }
 \description{
 take in a list of track lists (trackll) and export it into row-wise (ImageJ/MOSAIC) .csv files in the working directory
 }
 \details{
-##' The naming scheme for each export uses the ISO 8601 format, as follows:
+The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves all information, while maintaining relatively short computation time and easy readability in Excel/etc.
 
-[yy-MM-ddTHH-mm-ss][Last five characters of the file name].csv
+In order to import this .csv export back into a trackll at any point (while preserving all information), select input = 3 in createTrackll.
 
-The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves all information, while maintaining relatively short computation time and the ability to easily read it in Excel or etc.
-
-In order to import this .csv export back into a trackll at any point (while preserving all information), select option input 3 in createTrackll.
-
-If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead
+If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead and will take noticeably longer.
 
 It is not recommended that exportTrackll be run on merged list of track lists (trackll).
+
 Also, ensure that the input trackll is a list of track lists and not just a trackl track list
+
+The naming scheme for each export is as follows:
+
+[yy-MM-dd]_[HH-mm-ss]_[Last five characters of the file name].csv
+}
+\examples{
+#Basic function call to exportTrackll with 2 cores into current directory
+exportTrackll(trackll, cores = 2)
+
+#Export one track list
+.exportRowWise(trackl)
+
+Get current working directory
+getwd()
+
+Import export save back into a trackll
+trackll.2 <- createTrackll(folder = getwd(), input = 3, cores = 2)
 }

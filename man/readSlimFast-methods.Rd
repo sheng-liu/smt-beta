@@ -9,13 +9,21 @@
 .readSlimFast(file, interact = F,  ab.track = F, frameRecord = T)
 }
 \arguments{
-\item{file}{Full path to SlimFast .txt session file}
+\item{file}{Full path to SlimFast .txt session file.}
 
-\item{interact}{Open menu to interactively choose file}
+\item{interact}{Open menu to interactively choose file.}
 
-\item{ab.track}{Use absolute coordinates for tracks}
+\item{ab.track}{Use absolute coordinates for tracks.}
 
-\item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
+\item{frameRecord}{Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames).}
+
+\item{folder}{Full path Diatrack .mat session files output folder.}
+
+\item{merge}{Indicate if the output list should be merged into one- output list is divided by file names otherwise.}
+
+\item{mask}{Indicate if image mask should be applied to screen tracks (Note: the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks).}
+
+\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.}
 }
 \description{
 take in a SlimFast .txt session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories
@@ -29,9 +37,9 @@ The naming scheme for each track is as follows:
 }
 \examples{
 #Basic function call of .readSlimFast
-trackl <- .readSlimFast(interact = T)
+trackll <- readSlimFast(folder = /FILEPATH/, cores = 2)
 
-#Option to output .csv files after processing the track lists
-.exportRowWise(trackl)
+#Basic function call of .readSlimFast
+trackl <- .readSlimFast(interact = T)
 
 }

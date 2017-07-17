@@ -9,6 +9,8 @@
 readDiatrack(folder,merge=F,ab.track=F,mask=F,cores=1)
 }
 \arguments{
+\item{frameRecord}{Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames).}
+
 \item{folder}{Full path to Diatrack output file.}
 
 \item{merge}{An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.}

@@ -18,19 +18,19 @@
 ##' @usage 
 ##' createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 
-##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)
-##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)
-##' @param interact Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder)
-##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
-##' @param ab.track Use absolute coordinates for tracks
-##' @param mask A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.
-##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.
-##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
+##' @param folder Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast).
+##' @param input Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4).
+##' @param interact Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder).
+##' @param merge Indicate if the output list should be merged into one- output list is divided by file names otherwise.
+##' @param ab.track Use absolute coordinates for tracks.
+##' @param mask Indicate if image mask should be applied to screen tracks (Note: the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks).
+##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.
+##' @param frameRecord Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames). Highly recommended to leave on.
 
 ##' @details
 ##' It is highly advised that the frame record option be left on to preserve the most information, especially when linking frames.
 ##' 
-##' NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
+##' NOTE: If the initial creation of the trackll does not have a frame record, future exports and imports of the trackll will only preserve the start frames.
 ##'
 ##' The naming scheme for the list of track list is as follows:
 ##'  
@@ -45,7 +45,7 @@
 ##' trackll <- createTrackll(interact = T, cores = 2)
 ##' 
 ##' #Manual function call to process Diatrack session files (.mat)
-##' trackll <- createTrackll("/FILEPATH", input = 2, cores = 2)
+##' trackll <- createTrackll("/DIRECTORYPATH/", input = 2, cores = 2)
 
 ##' @export createTrackll
 
@@ -55,8 +55,11 @@
 
 createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T){
     
+    #Interactive menu to select file in desired folder and input type
     if (interact){
+        cat("Choose one file in the folder for processing... \n")
         folder = dirname(file.choose());
+        cat("Folder selection:", folder, "\n");
         cat("Enter input file type and press ENTER: \n")
         cat("1. Diatrack .txt file \n")
         cat("2. Diatrack .mat session file: \n")
@@ -65,211 +68,19 @@ createTrackll=function(folder, input = 0, interact = F, merge = F, ab.track = F,
         input <- readline();
     }
 
+    #Error if no input
     if (input > 4 || input < 1){
         cat("Restart script with correct input.")
     }
 
+    #Designate file types
     if (input == 1){
-        file.type = ".txt";
+        return(readDiatrack(folder, merge = merge, ab.track = ab.track, mask = mask, cores = cores, frameRecord = frameRecord));
     } else if (input == 2){
-        file.type = ".mat";
+        return(readDiaSessions(folder, merge = merge, ab.track = ab.track, mask = mask, cores = cores, frameRecord = frameRecord));
     } else if (input == 3){
-        file.type = ".csv";
+        return(readParticleTracker(folder, merge = merge, ab.track = ab.track, mask = mask, cores = cores, frameRecord = frameRecord));
     } else if (input == 4){
-        file.type = ".txt";
+        return(readSlimFast(folder, merge = merge, ab.track = ab.track, mask = mask, cores = cores, frameRecord = frameRecord));
     }
-
-    trackll = list()
-    track.holder = c()
-    
-    # getting a file list of Diatrack files in a directory
-    file.list = list.files(path = folder, pattern = file.type, full.names = T)
-    file.name = list.files(path = folder, pattern = file.type, full.names = F)
-    folder.name=basename(folder)
-    
-    # read in mask
-    mask.list=list.files(path=folder,pattern="_MASK.tif",full.names=T)
-    
-    if (mask==T & length(mask.list)==0){
-        cat("No image mask file ending '_MASK.tif' found.\n")
-    
-    }
-    
-    
-    # read in tracks
-    # list of list of data.frames,
-    # first level list of file names and
-    # second level list of data.frames
-    
-    max.cores = parallel::detectCores(logical = F)
-    
-    if (cores == 1){
-        
-        for (i in 1:length(file.list)){
-
-            if (input == 1){
-                track.list = .readDiatrack(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
-            } else if (input == 2){
-                track.list = .readDiaSessions(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
-            } else if (input == 3){
-                track.list = .readParticleTracker(file=file.list[i],ab.track=ab.track, frameRecord = frameRecord)
-            } else if (input == 4){
-                track.list = .readSlimFast(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
-            }
-            
-            # add indexPerTrackll to track name
-            indexPerTrackll = 1:length(track.list)
-            names(track.list) = mapply(paste, names(track.list), indexPerTrackll,sep = ".")
-            
-            trackll[[i]] = track.list
-            names(trackll)[i] = file.name[i]
-        }
-        
-    } else {
-        
-        # parallel this block of code
-        # assign reading in using .readDiatrack to each CPUs
-        
-        # detect number of cores
-        # FUTURE: if more than one, automatic using multicore
-        
-        if (cores>max.cores)
-            stop("Number of cores specified is greater than recomended maximum: ", max.cores)
-        
-        cat("Initiated parallel execution on", cores, "cores\n")
-        # use outfile="" to display result on screen
-        cl <- parallel::makeCluster(spec = cores,type = "PSOCK", outfile = "")
-        # register cluster
-        parallel::setDefaultCluster(cl)
-        
-        # pass environment variables to workers
-        if (input == 1){
-            parallel::clusterExport(cl,varlist=c(".readDiatrack","ab.track", "frameRecord"),envir=environment())
-        } else if (input == 2){
-            parallel::clusterExport(cl,varlist=c(".readDiaSessions","ab.track", "frameRecord"),envir=environment())
-        } else if (input == 3){
-            parallel::clusterExport(cl,varlist=c(".readParticleTracker","ab.track", "frameRecord"),envir=environment())
-        } else if (input == 4){
-            parallel::clusterExport(cl,varlist=c(".readSlimFast","ab.track", "frameRecord"),envir=environment())
-        }    
-        
-        # trackll=parallel::parLapply(cl,file.list,function(fname){
-        trackll=parallel::parLapply(cl,file.list,function(fname){
-
-            if (input == 1){
-                track.list = .readDiatrack(file=fname,ab.track=ab.track, frameRecord = frameRecord)
-            } else if (input == 2){
-                track.list = .readDiaSessions(file = fname, ab.track = ab.track, frameRecord = frameRecord)
-            } else if (input == 3){
-                track.list = .readParticleTracker(file=fname,ab.track=ab.track, frameRecord=frameRecord)
-            } else if (input == 4){
-                track.list = .readSlimFast(file = fname, ab.track = ab.track, frameRecord = frameRecord)
-            }
-
-            # add indexPerTrackll to track name
-            indexPerTrackll=1:length(track.list)
-            names(track.list)=mapply(paste,names(track.list),indexPerTrackll,sep=".")
-            return(track.list)
-        })
-        
-        # stop cluster
-        cat("\nStopping clusters...\n")
-        parallel::stopCluster(cl)
-        
-        names(trackll)=file.name
-        # names(track)=file.name
-        
-    }
-    
-    # cleaning tracks by image mask
-    # filtration by image mask
-    if (mask==T){
-        trackll=maskTracks(trackll=trackll,maskl=mask.list)
-    }
-    # merge masked tracks
-    # merge has to be done after mask
-    
-    # if (merge==T){
-    #     for (i in 1:length(file.list)){
-    #         trackll[[i]]=track[[i]]
-    #         names(trackll)[i]=file.name[i]
-    #     }
-    # }
-    
-    
-    # trackll naming scheme
-    # if merge==F, list takes the name of individual file name within folder
-    # file.name > data.frame.name
-    # if merge==T, list takes the folder name
-    # folder.name > data.frame.name
-    
-    if (merge==T){
-    
-        # trackll naming scheme
-        # if merge==F, list takes the name of individual file name within folder
-        # file.name > data.frame.name
-        # if merge==T, list takes the folder name
-        # folder.name > data.frame.name
-        
-        # concatenate track list into one list of data.frames
-        for (i in 1:length(file.list)){
-            track.holder=c(track.holder,trackll[[i]])
-        }
-        
-        # rename indexPerTrackll of index
-        # extrac index
-        Index=strsplit(names(track.holder),split="[.]")  # split="\\."
-        
-        # remove the last old indexPerTrackll
-        Index=lapply(Index,function(x){
-            x=x[1:(length(x)-1)]
-            x=paste(x,collapse=".")})
-        
-        # add indexPerTrackll to track name
-        indexPerTrackll=1:length(track.holder)
-        names(track.holder)=mapply(paste,Index,
-                                    indexPerTrackll,sep=".")
-        
-        # make the result a list of list with length 1
-        trackll=list()
-        trackll[[1]]=track.holder
-        names(trackll)[[1]]=folder.name
-        
-        # trackll=track.holder
-        }
-        
-        #     }else{
-        #
-        #         # list of list of data.frames,
-        #         # first level list of folder names and
-        #         # second level list of data.frames
-        #
-        #         for (i in 1:length(file.list)){
-        #
-        #             track=.readDiatrack(file=file.list[i],ab.track=ab.track)
-        #             # concatenate tracks into one list of data.frames
-        #             track.holder=c(track.holder,track)
-        #
-        #         }
-        #
-        #         # add indexPerTrackll to track name
-        #         indexPerTrackll=1:length(track.holder)
-        #
-        #         names(track.holder)=mapply(paste,names(track.holder),
-        #                                    indexPerTrackll,sep=".")
-        #
-        #         # make the result a list of list with length 1
-        #         trackll[[1]]=track.holder
-        #         names(trackll)[[1]]=folder.name
-        #
-        
-        #
-        #
-        #         if (mask==T){
-        #             trackll=maskTracks(trackll,mask.list)
-        #         }
-        #
-        #     }
-    
-    return(trackll)
 }

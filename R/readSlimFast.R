@@ -18,10 +18,14 @@
 ##' @usage 
 ##' .readSlimFast(file, interact = F,  ab.track = F, frameRecord = T)
 
-##' @param file Full path to SlimFast .txt session file
-##' @param interact Open menu to interactively choose file
-##' @param ab.track Use absolute coordinates for tracks
-##' @param frameRecord add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)
+##' @param folder Full path Diatrack .mat session files output folder.
+##' @param merge Indicate if the output list should be merged into one- output list is divided by file names otherwise.
+##' @param ab.track Use absolute coordinates for tracks.
+##' @param mask Indicate if image mask should be applied to screen tracks (Note: the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks).
+##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.
+##' @param frameRecord Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames).
+##' @param file Full path to SlimFast .txt session file.
+##' @param interact Open menu to interactively choose file.
 
 ##' @details
 ##' The naming scheme for each track is as follows:
@@ -32,14 +36,14 @@
 
 ##' @examples
 ##' #Basic function call of .readSlimFast
+##' trackll <- readSlimFast(folder = /FILEPATH/, cores = 2)
+##'
+##' #Basic function call of .readSlimFast
 ##' trackl <- .readSlimFast(interact = T)
-##' 
-##' #Option to output .csv files after processing the track lists
-##' .exportRowWise(trackl)
 ##' 
 
 ##' @export .readSlimFast
-
+##' @export readSlimFast
 ###############################################################################
 
 ## TO DO: More efficient way of reading by using dplyr split
@@ -127,4 +131,126 @@
     
     #Return track list
     return (track.list);
+}
+
+#### readDiaSessions ####
+
+readSlimFast = function(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T){
+    
+    trackll = list()
+    track.holder = c()
+    
+    # getting a file list of Diatrack files in a directory
+    file.list = list.files(path = folder, pattern = ".txt", full.names = T)
+    file.name = list.files(path = folder, pattern = ".txt", full.names = F)
+    folder.name=basename(folder)
+    
+    # read in mask
+    mask.list=list.files(path=folder,pattern="_MASK.tif",full.names=T)
+    
+    if (mask==T & length(mask.list)==0){
+        cat("No image mask file ending '_MASK.tif' found.\n")
+        
+    }
+    
+    
+    # read in tracks
+    # list of list of data.frames,
+    # first level list of file names and
+    # second level list of data.frames
+    
+    max.cores = parallel::detectCores(logical = F)
+    
+    if (cores == 1){
+        
+        for (i in 1:length(file.list)){
+            
+            track.list = .readSlimFast(file = file.list[i], ab.track = ab.track, frameRecord = frameRecord)
+            
+            # add indexPerTrackll to track name
+            indexPerTrackll = 1:length(track.list)
+            names(track.list) = mapply(paste, names(track.list), indexPerTrackll,sep = ".")
+            
+            trackll[[i]] = track.list
+            names(trackll)[i] = file.name[i]
+        }
+        
+    } else {
+        
+        # parallel this block of code
+        # assign reading in using .readDiatrack to each CPUs
+        
+        # detect number of cores
+        # FUTURE: if more than one, automatic using multicore
+        
+        if (cores>max.cores)
+            stop("Number of cores specified is greater than recomended maximum: ", max.cores)
+        
+        cat("Initiated parallel execution on", cores, "cores\n")
+        # use outfile="" to display result on screen
+        cl <- parallel::makeCluster(spec = cores,type = "PSOCK", outfile = "")
+        # register cluster
+        parallel::setDefaultCluster(cl)
+        
+        # pass environment variables to workers
+        parallel::clusterExport(cl,varlist=c(".readSlimFast","ab.track", "frameRecord"),envir=environment())
+        
+        # trackll=parallel::parLapply(cl,file.list,function(fname){
+        trackll=parallel::parLapply(cl,file.list,function(fname){
+            track=.readSlimFast(file=fname,ab.track=ab.track, frameRecord = frameRecord)
+            # add indexPerTrackll to track name
+            indexPerTrackll=1:length(track)
+            names(track)=mapply(paste,names(track),indexPerTrackll,sep=".")
+            return(track)
+        })
+        
+        # stop cluster
+        cat("Stopping clusters...\n")
+        parallel::stopCluster(cl)
+        
+        names(trackll)=file.name
+        # names(track)=file.name
+        
+    }
+    
+    # cleaning tracks by image mask
+    if (mask==T){
+        trackll=maskTracks(trackll=trackll,maskl=mask.list)
+    }
+    
+    # merge masked tracks
+    # merge has to be done after mask
+    
+    
+    if (merge==T){
+        
+        
+        # concatenate track list into one list of data.frames
+        for (i in 1:length(file.list)){
+            track.holder=c(track.holder,trackll[[i]])
+        }
+        
+        # rename indexPerTrackll of index
+        # extrac index
+        Index=strsplit(names(track.holder),split="[.]")  # split="\\."
+        
+        # remove the last old indexPerTrackll
+        Index=lapply(Index,function(x){
+            x=x[1:(length(x)-1)]
+            x=paste(x,collapse=".")})
+        
+        # add indexPerTrackll to track name
+        indexPerTrackll=1:length(track.holder)
+        names(track.holder)=mapply(paste,Index,
+                                   indexPerTrackll,sep=".")
+        
+        # make the result a list of list with length 1
+        trackll=list()
+        trackll[[1]]=track.holder
+        names(trackll)[[1]]=folder.name
+        
+        # trackll=track.holder
+    }
+    
+    return(trackll)
 }

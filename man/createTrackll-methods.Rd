@@ -8,21 +8,21 @@
 createTrackll(folder, input = 0, interact = F, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 }
 \arguments{
-\item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast)}
+\item{folder}{Full path output file folder (if they are .txt, ensure that they are either all Diatrack or all SlimFast).}
 
-\item{input}{Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4)}
+\item{input}{Input file type (Diatrack .txt file = 1; Diatrack .mat session file = 2; ImageJ .csv file = 3; SlimFast .txt file = 4).}
 
-\item{interact}{Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder)}
+\item{interact}{Open interactive menu to choose the desired folder by selecting any file in it and select input type (script will process all files of that type in this folder).}
 
-\item{merge}{An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.}
+\item{merge}{Indicate if the output list should be merged into one- output list is divided by file names otherwise.}
 
-\item{ab.track}{Use absolute coordinates for tracks}
+\item{ab.track}{Use absolute coordinates for tracks.}
 
-\item{mask}{A logical indicate if image mask should be applied to screen tracks. Default False. Note the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks.}
+\item{mask}{Indicate if image mask should be applied to screen tracks (Note: the mask file should have the same name as the Diatrack output txt file with a "_MASK.tif" ending. Users can use plotMask() and plotTrackOverlay() to see the mask and its effect on screening tracks).}
 
-\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralelled.}
+\item{cores}{Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.}
 
-\item{frameRecord}{add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames)}
+\item{frameRecord}{Add a fourth column to the track list after the xyz-coordinates for the frame that coordinate point was found (especially helpful when linking frames). Highly recommended to leave on.}
 }
 \description{
 take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a folder to output a list of track lists with the option to merge, mask, censor, record frames, and use multiple cores.
@@ -30,7 +30,7 @@ take in Diatrack (.txt or .mat), ImageJ (.csv), or SlimFast (.txt) input from a 
 \details{
 It is highly advised that the frame record option be left on to preserve the most information, especially when linking frames.
 
-NOTE: Diatrack .txt and ImageJ (.csv) input does not have the ability create a frame record and censor/uncensor, it will only extract whatever has been done by default to the .txt file.
+NOTE: If the initial creation of the trackll does not have a frame record, future exports and imports of the trackll will only preserve the start frames.
 
 The naming scheme for the list of track list is as follows:
  
@@ -45,5 +45,5 @@ Track: [Last five characters of the file name].[Start frame].[Length].[Track].[I
 trackll <- createTrackll(interact = T, cores = 2)
 
 #Manual function call to process Diatrack session files (.mat)
-trackll <- createTrackll("/FILEPATH", input = 2, cores = 2)
+trackll <- createTrackll("/DIRECTORYPATH/", input = 2, cores = 2)
 }

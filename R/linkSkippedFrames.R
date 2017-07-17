@@ -17,43 +17,54 @@
 
 ##' @usage 
 ##' linkSkippedFrames(track.list, tolerance, maxSkip)
+##' 
+##' .linkSkippedFrames(track.list, tolerance, maxSkip)
 
-##' @param track.list A track list (a list of trajectory data frames)
-##' @param tolerance distance tolerance level measured in pixels after the frame skip
-##' @param maxSkip maximum number of frames a trajectory can skip
+##' @param trackll A list of track lists.
+##' @param tolerance Distance tolerance level measured in pixels after the frame skip.
+##' @param maxSkip Maximum number of frames a trajectory can skip.
+##' @param cores Number of cores used for parallel computation. This can be the cores on a workstation, or on a cluster. Tip: each core will be assigned to read in a file when paralleled.
+##' @param track.list A track list (a list of trajectory data frames).
 
 ##' @details
 ##' Given user input for a tolerance level to limit how far the next point after the skip can deviate from the last point in pixel distance 
 ##' and a maximum number of frame skips possible, all trajectories falling within these parameters are automatically linked, renamed, and ordered accordingly. 
 ##' 
+##' Although not required, in order for the output to have a frame record column (recommended), the input must have one as well.
+##' 
+##' For a maxSkip example, if the maxSkip for a trajectory ending in frame 7 was 3, the next linked trajectory can start up to a maximum frame of 11)
+##' 
 ##' The naming scheme for each linked track is as follows:
 ##' 
 ##' [Last five characters of the file name].[Start frame #].[Length].[Track #].[# of links]
 ##' 
+##' Track List: [full name of input file]
+##'  
+##' Track: [Last five characters of the file name].[Start frame].[Length].[Track].[# of links].[Index in overall list (will differ from Track # when merging)]
+##' 
 ##' (Note: The last five characters of the file name, excluding the extension, cannot contain “.”)
-##' 
-##' Although not required, in order for the output to have a frame record column (recommended), the input must have one as well.
-##' 
-##' For a maxSkip example, if the maxSkip for a trajectory ending in frame 7 was 3, the next linked trajectory can start up to a maximum frame of 11)
 
 ##' @examples
 ##' #Basic function call of linkSkippedFrames
-##' trackll.linked <- linkSkippedFrames(trackll, tolerance = 4.00, maxSkip = 5)
+##' trackll.linked <- linkSkippedFrames(trackll, tolerance = 5, maxSkip = 10)
 ##' 
-##' #Option to output .csv files after processing the linked track lists
-##' outputRowWise(trackll.linked)
-##' outputColWise(trackll.linked)
+##' #Export links into .csv files
+##' exportTrackll(trackll.linked, cores = 2)
 
+##' @export .linkSkippedFrames
 ##' @export linkSkippedFrames
 
 ###############################################################################
 
-#### linkSkippedFrames ####
+#### .linkSkippedFrames ####
 
-linkSkippedFrames = function(track.list, tolerance, maxSkip){
+.linkSkippedFrames = function(track.list, tolerance, maxSkip){
+    
+    #Get abbreviated file name
+    file.name = getTrackFileName(track.list);
     
     #Confirmation text of function call
-    cat("Linking trajectories with a tolerance of",  tolerance, "and a maximum frame skip of", maxSkip,  "...\n");
+    cat("Linking", file.name, "...\n");
     
     #Instantiate empty linked track list
     track.list.linked = list();
@@ -155,9 +166,50 @@ linkSkippedFrames = function(track.list, tolerance, maxSkip){
     names(track.list.linked) = paste(file.subname, frame.list, length.list, c(1:length(track.list.linked)), linknum.list, sep=".");
     
     #Return linked track list and confirmation text
-    cat(Reduce("+", linknum.list), "links found.\n\n");
+    cat(Reduce("+", linknum.list), "links found in", file.name, "\n\n");
     
     return (track.list.linked);
+}
+
+#### linkSkippedFrames ####
+
+linkSkippedFrames = function(trackll, tolerance, maxSkip, cores = 1){
+    
+    # detect number of cores
+    max.cores=parallel::detectCores(logical=F)
+    
+    if (cores==1){
+        link.trackll = lapply(trackll,function(x){
+            .linkSkippedFrames(track.list = x, tolerance = tolerance, maxSkip = maxSkip)
+        })
+    } else {
+        # parallel excecute above block of code
+        if (cores>max.cores)
+            stop("Number of cores specified is greater than maxium: ",
+                 max.cores)
+        
+        cat("Initiated parallel execution on", cores, "cores\n")
+        
+        # use outfile="" to display result on screen
+        cl <- parallel::makeCluster(spec=cores,type="PSOCK",outfile="")
+        # register cluster
+        parallel::setDefaultCluster(cl)
+        
+        # pass environment variables to workers
+        parallel::clusterExport(cl,
+                                varlist=c(".linkSkippedFrames", "tolerance", "maxSkip"),
+                                envir=environment())
+        
+        link.trackll = parallel::parLapply(cl,trackll,function(x){
+            .linkSkippedFrames(track.list = x, tolerance = tolerance, maxSkip = maxSkip)
+        })
+        
+        # stop cluster
+        cat("Stopping clusters...\n")
+        parallel::stopCluster(cl)
+    }
+    return (link.trackll);
+    
 }
 
 #### Extra and useless functions ####
