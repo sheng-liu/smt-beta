@@ -2,7 +2,9 @@
 title: "smt-beta Guide"
 author: "Sun Jay Yoo"
 date: "July 18, 2017"
-output: html_document
+output:
+  pdf_document: default
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
