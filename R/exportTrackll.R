@@ -26,15 +26,14 @@
 ##' @param track.list A track list (a list of trajectory data frames).
 
 ##' @details
-##' The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves all information, while maintaining relatively short computation time and easy readability in Excel/etc.
+##' The reason why ImageJ/MOSAIC style .csv export was chosen is because it fully preserves track frame data, while maintaining short computation time and easy readability in Excel/etc.
 ##' 
 ##' In order to import this .csv export back into a trackll at any point (while preserving all information), select input = 3 in createTrackll.
 ##' 
 ##' If the track list does not have a fourth frame record column (not recommended), it will just output the start frame of each track instead and will take noticeably longer.
 ##' 
 ##' It is not recommended that exportTrackll be run on merged list of track lists (trackll).
-##' 
-##' Also, ensure that the input trackll is a list of track lists and not just a trackl track list
+##' Also, ensure that the input trackll is a list of track lists and not just a track list.
 ##' 
 ##' The naming scheme for each export is as follows:
 ##' 
@@ -47,10 +46,10 @@
 ##' #Export one track list
 ##' .exportRowWise(trackl)
 ##' 
-##' Get current working directory
+##' #Get current working directory
 ##' getwd()
 ##' 
-##' Import export save back into a trackll
+##' #Import export save back into a trackll
 ##' trackll.2 <- createTrackll(folder = getwd(), input = 3, cores = 2)
 
 ##' @export .exportRowWise

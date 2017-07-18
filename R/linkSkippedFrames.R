@@ -16,7 +16,7 @@
 ##' @description link trajectories skipped (or do not appear for) a number of frames
 
 ##' @usage 
-##' linkSkippedFrames(track.list, tolerance, maxSkip)
+##' linkSkippedFrames(trackll, tolerance, maxSkip, cores = 1)
 ##' 
 ##' .linkSkippedFrames(track.list, tolerance, maxSkip)
 
@@ -29,10 +29,9 @@
 ##' @details
 ##' Given user input for a tolerance level to limit how far the next point after the skip can deviate from the last point in pixel distance 
 ##' and a maximum number of frame skips possible, all trajectories falling within these parameters are automatically linked, renamed, and ordered accordingly. 
+##' For a maxSkip example, if the maxSkip for a trajectory ending in frame 7 was 3, the next linked trajectory can start up to a maximum frame of 11).
 ##' 
 ##' Although not required, in order for the output to have a frame record column (recommended), the input must have one as well.
-##' 
-##' For a maxSkip example, if the maxSkip for a trajectory ending in frame 7 was 3, the next linked trajectory can start up to a maximum frame of 11)
 ##' 
 ##' The naming scheme for each linked track is as follows:
 ##' 
@@ -48,7 +47,7 @@
 ##' #Basic function call of linkSkippedFrames
 ##' trackll.linked <- linkSkippedFrames(trackll, tolerance = 5, maxSkip = 10)
 ##' 
-##' #Export links into .csv files
+##' #Export linked trackll into .csv files
 ##' exportTrackll(trackll.linked, cores = 2)
 
 ##' @export .linkSkippedFrames
