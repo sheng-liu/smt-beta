@@ -11,8 +11,10 @@
 ##'
 ##' @description read output file (tracks/trajecotries) from Diatrack.
 
-##' @usage readDiatrack(folder,merge=F,ab.track=F,mask=F,cores=1)
-##'
+##' @usage 
+##' readDiatrack(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
+##' 
+##' .readDiatrack(file, interact = F, ab.track = F, frameRecord = F)
 ##'
 ## @method # this roxygen directive does not working
 ##' @param folder Full path to Diatrack output file.
@@ -77,7 +79,7 @@
 ## .readDiatrack
 ## a function to read one diatrack txt file and returns a list of tracks
 
-.readDiatrack=function(file, interact=F,ab.track=F, frameRecord = T){
+.readDiatrack=function(file, interact=F,ab.track=F, frameRecord = F){
 
     # interactively open window
     if (interact==T) {

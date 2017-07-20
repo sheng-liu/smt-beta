@@ -11,9 +11,11 @@
 ##'
 ##' @description Read output file (tracks/trajectories in csv format) from ParticleTracker (a program of ImageJ plugin MosaicSuit).
 
-##' @usage readParticleTracker(folder,merge=F,ab.track=F,mask=F,cores=1)
-##'
-##'
+##' @usage 
+##' readParticleTracker(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
+##' 
+##' .readParticleTracker(file, interact = F, ab.track = F, frameRecord = F)
+
 ## @method # this roxygen directive does not working
 ##' @param folder Full path to Diatrack output file.
 ##' @param merge An logical indicate if the output list should be merged into one. Default merge = FALSE, output list is divided by file names.
@@ -80,7 +82,7 @@
 ## .readParticleTracker
 ## a function to read ParticleTracker (a program of ImageJ plugin MosaicSuit) output .csv file and returns a list of tracks
 
-.readParticleTracker=function(file,interact=F,ab.track=F, frameRecord=T){
+.readParticleTracker=function(file,interact=F,ab.track=F, frameRecord=F){
 
     # interactively open window
     if (interact==T) {

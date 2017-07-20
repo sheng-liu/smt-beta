@@ -16,7 +16,8 @@
 ##' @description take in a SlimFast .txt session file as input, along with several other user-configurable parameters and output options, to return a track list of all the trajectories
 
 ##' @usage 
-##' .readSlimFast(file, interact = F,  ab.track = F, frameRecord = T)
+##' readSlimFa(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
+##' .readSlimFast(file, interact = F,  ab.track = F, frameRecord = F)
 
 ##' @param folder Full path Diatrack .mat session files output folder.
 ##' @param merge Indicate if the output list should be merged into one- output list is divided by file names otherwise.
@@ -50,7 +51,7 @@
 
 #### .readSlimFast ####
 
-.readSlimFast = function(file, interact = F,  ab.track = F, frameRecord = T){
+.readSlimFast = function(file, interact = F,  ab.track = F, frameRecord = F){
     
     #Interactively open window
     if (interact == TRUE) {

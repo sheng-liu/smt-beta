@@ -18,7 +18,7 @@
 ##' @usage 
 ##' readDiaSessions(folder, merge = F, ab.track = F, mask = F, cores = 1, frameRecord = T)
 ##' 
-##' .readDiaSessions(file, interact = T, ab.track = F, frameRecord = T)
+##' .readDiaSessions(file, interact = F, ab.track = F, frameRecord = F)
 
 ##' @param folder Full path Diatrack .mat session files output folder.
 ##' @param merge Indicate if the output list should be merged into one- output list is divided by file names otherwise.
@@ -74,7 +74,7 @@
 #install.packages("R.matlab")
 #library(R.matlab)
 
-.readDiaSessions = function(file, interact = F, ab.track = F, frameRecord = T){
+.readDiaSessions = function(file, interact = F, ab.track = F, frameRecord = F){
     
     #Interactively open window
     if (interact == TRUE) {
