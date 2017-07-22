@@ -334,5 +334,5 @@ displacementCDF=function(trackll,dt=6,resolution=0.107,plot=F,output=F,bivar=F){
 }
 
 ## -----
-# TODO: output dat V
-# TODO: base:ecdf 1228 seems to be more accurate as ggplot2::stat_ecdf also have two outside values, one is negative at zero, the other is extra 1 at the end, which should be removed.  V
+# DONE: output dat V
+# DONE: base:ecdf 1228 seems to be more accurate as ggplot2::stat_ecdf also have two outside values, one is negative at zero, the other is extra 1 at the end, which should be removed.  V

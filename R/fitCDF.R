@@ -343,7 +343,7 @@ fitCDF=function(cdf, components=c("one","two","three"),
 
 
 # ------------------------------------------------------------------------------
-#TODO:
+# DONE:
 
 # a better density plot than ggplot2 there, or adjust it to be better /professiona looking
 #   plot(density(r),main="distribution of displacement r")

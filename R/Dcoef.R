@@ -10,9 +10,10 @@
 ##' @description Caclulate diffusion coefficient (Dcoef) for trajecotries.
 ##'
 ##' @usage
-##' Dcoef( trackll,dt=6,filter=c(min=7,max=Inf),rsquare=0.8,resolution=0.107,
+##' Dcoef( MSD=NULL,trackll=NULL,dt=6,filter=c(min=7,max=Inf),rsquare=0.8,resolution=0.107,
 ##'        binwidth=NULL,method=c("static","percentage","rolling.window"),
 ##'        plot=F,output=F,t.interval=0.01,profile=NULL)
+##' @param MSD Mean Square Displacement calculated using msd() function. Either MSD or trackll can be passed into Dcoef for calculation of diffusion coefficient.
 ##' @param trackll Track list output from readDiatrack().
 ##' @param dt Time intervals.
 ##' @param filter a vector specifies the minimum and max length of trajecotries
